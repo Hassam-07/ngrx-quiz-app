@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Question } from './+state/quiz-app/quiz.models';
+import { Question } from '../quiz-interface/quizApp.models';
 
 @Injectable({
   providedIn: 'root',

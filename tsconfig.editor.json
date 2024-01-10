@@ -1,6 +1,10 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "lib/src/lib/quiz-api-service/quiz-app.service.ts",
+    "lib/src/lib/quiz-api-service/quiz-app.service.spec.ts"
+  ],
   "compilerOptions": {
     "types": ["jest", "node"]
   }
