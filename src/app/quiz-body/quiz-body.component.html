@@ -1,0 +1,19 @@
+<h1>Trivia-quiz App</h1>
+<div class="main">
+  <h3 class="question">{{ currentQuestion }}</h3>
+
+  <div class="options">
+    <button
+      *ngFor="let option of options"
+      [disabled]="selectedButton"
+      (click)="handleOption(option)"
+      [ngClass]="{
+        correct: response && option === correctAnswer,
+        inCorrect:
+          response && response !== correctAnswer ? option === response : null
+      }"
+    >
+      {{ option }}
+    </button>
+  </div>
+</div>

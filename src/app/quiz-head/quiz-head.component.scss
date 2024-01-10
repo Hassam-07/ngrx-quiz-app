@@ -1,0 +1,34 @@
+$blue: #548ec0;
+$light-blue: #afcfea;
+$light-green: #80f595;
+$light-red: #eb8080;
+$light-color: #fff;
+$dark-color: #000;
+$grey-color: #f2f2f2;
+$transition: all 300ms ease-in-out;
+.quiz-head {
+  .quiz-title {
+    text-align: center;
+    font-size: 2rem;
+  }
+  .flexbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between !important;
+    .quiz-score {
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
+      width: 100px;
+      height: 50px;
+      margin: 0.5rem auto 1rem auto;
+      color: $blue;
+    }
+    .flex {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

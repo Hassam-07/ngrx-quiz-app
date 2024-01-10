@@ -1,1 +1,33 @@
-<quiz-app-nx-welcome></quiz-app-nx-welcome> <router-outlet></router-outlet>
+<div class="flex">
+  <div class="wrapper">
+    <ng-container *ngIf="showFooter; else footer">
+      <quiz-app-quiz-head
+        [currentQuestionNumber]="currentQuestionNumber"
+        [totalQuestions]="totalQuestions"
+        [score]="score"
+      ></quiz-app-quiz-head>
+      <quiz-app-quiz-body
+        [correctAnswer]="correctAnswer"
+        [response]="response"
+        (optionClick)="handleOption($event)"
+        [selectedButton]="selectedButton"
+        [currentQuestion]="currentQuestion"
+        [options]="options"
+      >
+      </quiz-app-quiz-body>
+      <quiz-app-quiz-footer
+        (nextButton)="nextQuestion()"
+        (skipButton)="skipQuestion()"
+      ></quiz-app-quiz-footer>
+    </ng-container>
+    <ng-template #footer>
+      <div class="restartBtnFooter">
+        <h1>Quiz Completed</h1>
+        <h3>Your final score is {{ score }} out of {{ totalQuestions }}</h3>
+        <button class="restartQuiz" (click)="restartQuiz()">
+          Restart Quiz
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</div>

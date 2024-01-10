@@ -1,0 +1,130 @@
+$blue: #548ec0;
+$light-blue: #afcfea;
+$light-green: #80f595;
+$light-red: #eb8080;
+$light-color: #fff;
+$dark-color: #000;
+$grey-color: #f2f2f2;
+$transition: all 300ms ease-in-out;
+
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  .wrapper {
+    background: $light-color;
+    padding: 1.5rem 4rem 3rem 4rem;
+    width: 600px;
+    border-top-left-radius: 1.5rem;
+    border-bottom-right-radius: 1.5rem;
+    position: relative;
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%), 0 1px 3px rgb(0 0 0 / 10%);
+  }
+}
+
+/* js related */
+
+.selected {
+  background-color: $light-green !important;
+  color: $dark-color !important;
+  border-color: $light-green !important;
+  box-shadow: 0 4px 0 0 $light-green !important;
+}
+
+.correct {
+  background-color: $light-green !important;
+  color: $dark-color !important;
+  border-color: $light-green !important;
+  box-shadow: 0 4px 0 0 $light-green !important;
+}
+
+.inCorrect {
+  background-color: $light-red !important;
+  color: $dark-color !important;
+  border-color: $light-red !important;
+  box-shadow: 0 4px 0 0 $light-green !important;
+}
+
+#result {
+  padding: 0.7rem 0;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.3rem;
+  i {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 30px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: $blue;
+    color: $light-color;
+  }
+}
+
+/* CSS */
+.restartBtnFooter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1.3rem;
+
+  .restartQuiz {
+    background-color: #0095ff;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    box-shadow: rgba(255, 255, 255, 0.4) 0 1px 0 0 inset;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: -apple-system, system-ui, 'Segoe UI', 'Liberation Sans',
+      sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.15385;
+    margin: 0;
+    outline: none;
+    padding: 8px 0.8em;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: baseline;
+    white-space: nowrap;
+    &:hover,
+    &:focus {
+      background-color: #07c;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(0, 149, 255, 0.15);
+    }
+
+    &:active {
+      background-color: #0064bd;
+      box-shadow: none;
+    }
+  }
+}
+
+@media (max-width: 678px) {
+  .quiz-title {
+    font-size: 1.6rem;
+  }
+  .wrapper {
+    margin: 3rem 0;
+    width: 90%;
+    height: 90%;
+    padding: 1.5rem 1rem 3rem 1rem;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .footer button {
+    font-size: 1rem;
+  }
+}
