@@ -1,33 +1,34 @@
 <div class="flex">
   <div class="wrapper">
-    <ng-container *ngIf="showFooter; else footer">
-      <quiz-app-quiz-head
-        [currentQuestionNumber]="currentQuestionNumber"
-        [totalQuestions]="totalQuestions"
-        [score]="score"
-      ></quiz-app-quiz-head>
-      <quiz-app-quiz-body
-        [correctAnswer]="correctAnswer"
-        [response]="response"
-        (optionClick)="handleOption($event)"
-        [selectedButton]="selectedButton"
-        [currentQuestion]="currentQuestion"
-        [options]="options"
-      >
-      </quiz-app-quiz-body>
-      <quiz-app-quiz-footer
-        (nextButton)="nextQuestion()"
-        (skipButton)="skipQuestion()"
-      ></quiz-app-quiz-footer>
+    <ng-container *ngIf="triviaState$ | async as trivia">
+      <!-- {{ trivia | json }} -->
+      <ng-container *ngIf="trivia.showFooter; else footer">
+        <quiz-app-quiz-head
+          [currentQuestionNumber]="trivia.currentQuestionNumber"
+          [totalQuestions]="trivia.totalQuestions"
+          [score]="trivia.score"
+        ></quiz-app-quiz-head>
+        <quiz-app-quiz-body
+          [correctAnswer]="trivia.correctAnswer"
+          [response]="trivia.response"
+          (optionClick)="handleOption($event)"
+          [currentQuestion]="trivia.currentQuestion"
+          [options]="trivia.options"
+        ></quiz-app-quiz-body>
+        <quiz-app-quiz-footer
+          [lastQuestion]="trivia.lastQuestion"
+          [previousAllowed]="previousAllowed"
+          (nextButton)="nextQuestion()"
+          (previousButton)="previousQuestion()"
+          (skipButton)="skipQuestion()"
+        ></quiz-app-quiz-footer>
+      </ng-container>
+      <ng-template #footer>
+        <quiz-app-quiz-result
+          (restartTrivia)="restartQuiz()"
+        ></quiz-app-quiz-result>
+        <router-outlet></router-outlet>
+      </ng-template>
     </ng-container>
-    <ng-template #footer>
-      <div class="restartBtnFooter">
-        <h1>Quiz Completed</h1>
-        <h3>Your final score is {{ score }} out of {{ totalQuestions }}</h3>
-        <button class="restartQuiz" (click)="restartQuiz()">
-          Restart Quiz
-        </button>
-      </div>
-    </ng-template>
   </div>
 </div>

@@ -1,39 +1,52 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { QUIZ_FEATURE_KEY, QuizState, quizAdapter } from './quiz.reducer';
+import { createSelector, createFeatureSelector } from '@ngrx/store';
+import { QUIZ_FEATURE_KEY, TriviaState } from './quiz.reducer';
 
-// Lookup the 'Quiz' feature state managed by NgRx
-export const selectQuizState =
-  createFeatureSelector<QuizState>(QUIZ_FEATURE_KEY);
+// Get the feature state
+export const selectTriviaState =
+  createFeatureSelector<TriviaState>(QUIZ_FEATURE_KEY);
 
-const { selectAll, selectEntities } = quizAdapter.getSelectors();
-
-export const selectQuizLoaded = createSelector(
-  selectQuizState,
-  (state: QuizState) => state.loaded
+// Selectors for different parts of the state
+export const selectShowFooter = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.showFooter
 );
 
-export const selectQuizError = createSelector(
-  selectQuizState,
-  (state: QuizState) => state.error
+export const selectCurrentQuestionNumber = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.currentQuestionNumber
 );
 
-export const selectAllQuiz = createSelector(
-  selectQuizState,
-  (state: QuizState) => selectAll(state)
+export const selectTotalQuestions = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.totalQuestions
 );
 
-export const selectQuizEntities = createSelector(
-  selectQuizState,
-  (state: QuizState) => selectEntities(state)
+export const selectScore = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.score
 );
 
-export const selectSelectedId = createSelector(
-  selectQuizState,
-  (state: QuizState) => state.selectedId
+export const selectCurrentQuestion = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.currentQuestion
 );
 
-export const selectEntity = createSelector(
-  selectQuizEntities,
-  selectSelectedId,
-  (entities, selectedId) => (selectedId ? entities[selectedId] : undefined)
+export const selectOptions = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.options
+);
+
+// export const selectSelectedButton = createSelector(
+//   selectTriviaState,
+//   (state: TriviaState) => state.selectedButton
+// );
+
+export const selectCorrectAnswer = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.correctAnswer
+);
+
+export const selectResponse = createSelector(
+  selectTriviaState,
+  (state: TriviaState) => state.response
 );

@@ -1,4 +1,20 @@
 <div class="footer">
-  <button (click)="nextQuestion()" class="next-question">Next</button>
+  <button
+    [disabled]="!previousAllowed"
+    type="button"
+    class="previous-question"
+    (click)="previousQuestion()"
+  >
+    Previous
+  </button>
+  <ng-container>
+    <button (click)="nextQuestion()" class="next-question">
+      <!-- Next -->
+      <span *ngIf="!lastQuestion; else finishButton">Next</span>
+    </button>
+  </ng-container>
+  <ng-template #finishButton>
+    <span>Finish</span>
+  </ng-template>
   <button (click)="skipQuestion()" class="skip-question">Skip</button>
 </div>

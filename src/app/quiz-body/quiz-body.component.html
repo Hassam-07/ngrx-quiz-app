@@ -5,7 +5,7 @@
   <div class="options">
     <button
       *ngFor="let option of options"
-      [disabled]="selectedButton"
+      [disabled]="response"
       (click)="handleOption(option)"
       [ngClass]="{
         correct: response && option === correctAnswer,

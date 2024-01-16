@@ -9,10 +9,9 @@ export class QuizBodyComponent {
   @Input() response!: string;
   @Input() currentQuestion = '';
   @Input() options: string[] = [];
-  // @Input() response: string | null = null;
   @Input() correctAnswer!: string;
   @Input() remainingTime = 0;
-  @Input() selectedButton!: boolean;
+  // @Input() selectedButton!: boolean;
   @Input() choiceType!: string;
 
   @Output() nextButton = new EventEmitter();
