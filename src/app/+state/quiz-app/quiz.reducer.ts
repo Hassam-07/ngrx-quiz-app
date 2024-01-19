@@ -57,6 +57,9 @@ export const quizReducer = createReducer(
     lastQuestion: trivia.length === state.totalQuestions,
   })),
   on(triviaActions.nextQuestion, (state) => {
+    const currentQuestionIndex = state.currentQuestionNumber;
+    // const currentQuestion = state.questions[currentQuestionIndex];
+    const currentResponse = state.userResponses[currentQuestionIndex] || '';
     if (state.currentQuestionNumber < state.totalQuestions) {
       const nextQuestion = state.questions[state.currentQuestionNumber];
       console.log('Last Question in reducer:', state.lastQuestion);
@@ -71,7 +74,7 @@ export const quizReducer = createReducer(
         lastQuestion: false,
         // selectedButton: false,
         // answered: false,
-        response: '',
+        response: currentResponse,
       };
     } else {
       console.log('Setting lastQuestion to true in reducer');
@@ -79,6 +82,7 @@ export const quizReducer = createReducer(
         ...state,
         showFooter: false,
         lastQuestion: true,
+        // response: currentResponse,
       };
     }
   }),

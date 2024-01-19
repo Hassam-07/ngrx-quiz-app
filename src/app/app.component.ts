@@ -149,11 +149,11 @@ export class AppComponent implements OnInit {
   }
   previousQuestion() {
     this.store.dispatch(QuizPageActions.previousQuestion());
-    if (this.currentQuestionNumber > 1) {
-      this.currentQuestionNumber--;
-      this.currentQuestion =
-        this.questions[this.currentQuestionNumber].question.text;
-      console.log(this.currentQuestionNumber);
-    }
+    // if (this.currentQuestionNumber > 1) {
+    //   this.currentQuestionNumber--;
+    //   this.currentQuestion =
+    //     this.questions[this.currentQuestionNumber].question.text;
+    //   console.log(this.currentQuestionNumber);
+    // }
   }
 }
