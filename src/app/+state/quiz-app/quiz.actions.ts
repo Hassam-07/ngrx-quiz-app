@@ -9,22 +9,36 @@ export const initQuiz = createAction('[Quiz Page] Init');
 //   props<{ quiz: QuizEntity[] }>()
 // );
 
-export const loadTrivia = createAction('[Quiz] Load Trivia');
-export const triviaLoaded = createAction(
-  '[Quiz/API] Trivia Loaded Success',
-  props<{ trivia: Question[] }>()
-);
-export const loadQuizFailure = createAction(
-  '[Quiz/API] Load Quiz Failure',
-  props<{ error: string }>()
-);
+// export const loadTrivia = createAction('[Quiz] Load Trivia');
+// export const triviaLoaded = createAction(
+//   '[Quiz/API] Trivia Loaded Success',
+//   props<{ trivia: Question[] }>()
+// );
+// export const loadQuizFailure = createAction(
+//   '[Quiz/API] Load Quiz Failure',
+//   props<{ error: string }>()
+// );
+// export const loadCategories = createAction('[Quiz] Load Categories');
+// export const loadCategoriesSuccess = createAction(
+//   '[Quiz] Load Categories Success',
+//   props<{ categories: string[] }>()
+// );
+// export const loadCategoriesFailure = createAction(
+//   '[Quiz] Load Categories Failure',
+//   props<{ error: any }>()
+// );
 
-export const answerQuestion = createAction(
-  '[Quiz] Answer Question',
-  props<{ guess: string }>()
-);
+// export const submitForm = createAction(
+//   '[Quiz] Submit Form',
+//   props<{ formValue: any }>()
+// );
 
-export const nextQuestion = createAction('[Quiz] Next Question');
-export const skipQuestion = createAction('[Quiz] Skip Question');
-export const previousQuestion = createAction('[Quiz] Previous Question');
-export const restartQuiz = createAction('[Quiz] Restart Quiz');
+// export const answerQuestion = createAction(
+//   '[Quiz] Answer Question',
+//   props<{ guess: string }>()
+// );
+
+// export const nextQuestion = createAction('[Quiz] Next Question');
+// export const skipQuestion = createAction('[Quiz] Skip Question');
+// export const previousQuestion = createAction('[Quiz] Previous Question');
+// export const restartQuiz = createAction('[Quiz] Restart Quiz');

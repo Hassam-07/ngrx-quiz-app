@@ -1,5 +1,6 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { Question } from 'lib/src/lib/quiz-interface/quizApp.models';
+import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
 
 export const QuizPageActions = createActionGroup({
   source: 'Quiz',
@@ -11,6 +12,9 @@ export const QuizPageActions = createActionGroup({
     'Skip Question': emptyProps(),
     'Restart Quiz': emptyProps(),
     'Previous Question': emptyProps(),
+    'load Categories': emptyProps(),
+    'submit Form': props<{ formValue: any }>(),
+    'set Current Question': props<{ currentQuestionNumber: number }>(),
   },
 });
 
@@ -19,5 +23,7 @@ export const QuizApiActions = createActionGroup({
   events: {
     'Trivia Loaded Success': props<{ trivia: Question[] }>(),
     'Load Quiz Failure': props<{ error: any }>(),
+    'load Categories Success': props<{ categories: Categories }>(),
+    'load Categories Failure': props<{ error: any }>(),
   },
 });

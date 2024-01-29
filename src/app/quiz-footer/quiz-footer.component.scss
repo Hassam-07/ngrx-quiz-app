@@ -113,3 +113,71 @@
     }
   }
 }
+
+.option-window {
+  position: absolute;
+  bottom: 5px;
+  left: 25%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+  width: 25rem;
+  height: 35vh;
+  background-color: white;
+  overflow-y: auto;
+  animation: uptransition 0.5s linear;
+
+  .radio-btns {
+    padding-top: 2rem;
+    cursor: pointer;
+
+    div {
+      padding: 0.4rem 0.9rem;
+      font-size: 19px;
+
+      label {
+        cursor: pointer;
+        margin-left: 0.8rem;
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.8;
+          box-shadow: 0 0 0 0 transparent;
+          // transform: normal
+        }
+      }
+    }
+  }
+}
+
+@keyframes uptransition {
+  0% {
+    transform: translateY(100%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes righttransition {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+// .selected-option {
+//   color: blue;
+// }
+
+.correct {
+  color: #2a9d8f;
+}
+
+.inCorrect {
+  color: red;
+}

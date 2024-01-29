@@ -4,7 +4,10 @@ import { createReducer, on, Action } from '@ngrx/store';
 import * as triviaActions from './quiz.actions';
 // import { QuizEntity } from './quiz.models';
 import { Question } from 'lib/src/lib/quiz-interface/quizApp.models';
-import { selectOptions } from './quiz.selectors';
+// import { selectOptions } from './quiz.selectors';
+import { QuizApiActions, QuizPageActions } from './quizApp.actions';
+import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
+import { selectCurrentQuestionNumber } from './quiz.selectors';
 
 export const QUIZ_FEATURE_KEY = 'quiz';
 
@@ -24,6 +27,7 @@ export interface TriviaState {
   lastQuestion: boolean;
   previousAllowed: boolean;
   userResponses: string[];
+  categories: Categories;
 }
 
 export const initialState: TriviaState = {
@@ -42,11 +46,12 @@ export const initialState: TriviaState = {
   lastQuestion: false,
   previousAllowed: false,
   userResponses: [],
+  categories: {},
 };
 
 export const quizReducer = createReducer(
   initialState,
-  on(triviaActions.triviaLoaded, (state, { trivia }) => ({
+  on(QuizApiActions.triviaLoadedSuccess, (state, { trivia }) => ({
     ...state,
     questions: trivia,
     totalQuestions: trivia.length,
@@ -56,25 +61,30 @@ export const quizReducer = createReducer(
       .sort(),
     lastQuestion: trivia.length === state.totalQuestions,
   })),
-  on(triviaActions.nextQuestion, (state) => {
+  on(QuizPageActions.nextQuestion, (state) => {
     const currentQuestionIndex = state.currentQuestionNumber;
-    // const currentQuestion = state.questions[currentQuestionIndex];
+    const nextQuestion = state.questions[currentQuestionIndex];
     const currentResponse = state.userResponses[currentQuestionIndex] || '';
+    const correctAnswer = nextQuestion.correctAnswer;
     if (state.currentQuestionNumber < state.totalQuestions) {
       const nextQuestion = state.questions[state.currentQuestionNumber];
       console.log('Last Question in reducer:', state.lastQuestion);
+
+      // Save the response before moving to the next question
+      const updatedUserResponses = [...state.userResponses];
+      updatedUserResponses[currentQuestionIndex] = currentResponse;
       return {
         ...state,
         currentQuestionNumber: state.currentQuestionNumber + 1,
-        currentQuestion: nextQuestion.question.text,
+        // currentQuestion: nextQuestion.question.text,
         options: nextQuestion.incorrectAnswers
           .concat(nextQuestion.correctAnswer)
           .sort(),
         selectedOption: undefined,
         lastQuestion: false,
-        // selectedButton: false,
-        // answered: false,
         response: currentResponse,
+        userResponses: updatedUserResponses,
+        correctAnswer,
       };
     } else {
       console.log('Setting lastQuestion to true in reducer');
@@ -82,17 +92,18 @@ export const quizReducer = createReducer(
         ...state,
         showFooter: false,
         lastQuestion: true,
-        // response: currentResponse,
+        response: currentResponse,
+        correctAnswer: '',
       };
     }
   }),
-  on(triviaActions.skipQuestion, (state) => {
+  on(QuizPageActions.skipQuestion, (state) => {
     if (state.currentQuestionNumber < state.totalQuestions) {
       const nextQuestion = state.questions[state.currentQuestionNumber];
       return {
         ...state,
         currentQuestionNumber: state.currentQuestionNumber + 1,
-        currentQuestion: nextQuestion.question.text,
+        // currentQuestion: nextQuestion.question.text,
         options: nextQuestion.incorrectAnswers
           .concat(nextQuestion.correctAnswer)
           .sort(),
@@ -102,27 +113,30 @@ export const quizReducer = createReducer(
       return { ...state, showFooter: false };
     }
   }),
-  on(triviaActions.previousQuestion, (state) => {
+  on(QuizPageActions.previousQuestion, (state) => {
     if (state.currentQuestionNumber > 1) {
       const previousQuestionIndex = state.currentQuestionNumber - 2;
       const previousQuestion = state.questions[previousQuestionIndex];
+      const response = state.userResponses[previousQuestionIndex] || '';
+      const correctAnswer = previousQuestion.correctAnswer;
       console.log(previousQuestionIndex);
       return {
         ...state,
         currentQuestionNumber: state.currentQuestionNumber - 1,
-        currentQuestion: previousQuestion.question.text,
+        // currentQuestion: previousQuestion.question.text,
         options: previousQuestion.incorrectAnswers
           .concat(previousQuestion.correctAnswer)
           .sort(),
-        selectedOption: state.userResponses[previousQuestionIndex] || undefined,
-        response: state.userResponses[previousQuestionIndex] || '',
+        selectedOption: response || undefined,
+        response,
+        correctAnswer,
       };
     } else {
       console.log('previous allowed');
       return { ...state, previousAllowed: false };
     }
   }),
-  on(triviaActions.answerQuestion, (state, { guess }) => {
+  on(QuizPageActions.answerQuestion, (state, { guess }) => {
     const correctAnswer =
       state.questions[state.currentQuestionNumber - 1].correctAnswer;
     const updatedResponses = [...state.userResponses];
@@ -147,8 +161,29 @@ export const quizReducer = createReducer(
       };
     }
   }),
-  on(triviaActions.restartQuiz, (state) => ({
+  on(QuizPageActions.restartQuiz, (state) => ({
     ...state,
     ...initialState,
-  }))
+  })),
+  on(QuizApiActions.loadCategoriesSuccess, (state, { categories }) => ({
+    ...state,
+    categories,
+  })),
+  on(QuizPageActions.setCurrentQuestion, (state, { currentQuestionNumber }) => {
+    if (
+      currentQuestionNumber > 0 &&
+      currentQuestionNumber <= state.questions.length
+    ) {
+      const currentQuestion = state.questions[currentQuestionNumber - 1];
+      return {
+        ...state,
+        currentQuestion: currentQuestion.question.text,
+        options: currentQuestion.incorrectAnswers
+          .concat(currentQuestion.correctAnswer)
+          .sort(),
+        currentQuestionNumber: currentQuestionNumber,
+      };
+    }
+    return state;
+  })
 );

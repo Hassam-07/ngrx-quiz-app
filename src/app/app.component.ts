@@ -1,13 +1,34 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 // import { QuizAppService } from 'lib/src/lib/quiz-api-service/quiz-app.service';
 import { Question } from 'lib/src/lib/quiz-interface/quizApp.models';
 // import * as QuizActions from './+state/quiz-app/quiz.actions';
-import { QuizPageActions } from './+state/quiz-app/quizApp.actions';
+import {
+  QuizApiActions,
+  QuizPageActions,
+} from './+state/quiz-app/quizApp.actions';
 
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Observable, map } from 'rxjs';
+import { Store, select } from '@ngrx/store';
 import { TriviaState } from './+state/quiz-app/quiz.reducer';
-import { selectTriviaState } from './+state/quiz-app/quiz.selectors';
+import {
+  selectCategories,
+  selectCurrentQuestion,
+  selectCurrentQuestionNumber,
+  selectQuestions,
+  selectTotalQuestions,
+  selectTriviaState,
+} from './+state/quiz-app/quiz.selectors';
+import { FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+import { QuizAppService } from 'lib/src/lib/quiz-api-service/quiz-app.service';
+import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
+// import { loadCategories, submitForm } from './+state/quiz-app/quiz.actions';
 // import { ConstantPool } from '@angular/compiler';
 
 @Component({
@@ -17,11 +38,19 @@ import { selectTriviaState } from './+state/quiz-app/quiz.selectors';
 })
 export class AppComponent implements OnInit {
   // constructor(private triviaQuizService: QuizAppService) {}
-  constructor(private store: Store<TriviaState>) {}
-
-  currentQuestionNumber = 1;
-  totalQuestions = 1;
+  constructor(
+    private store: Store<TriviaState>,
+    private router: Router,
+    private triviaQuizService: QuizAppService
+  ) {}
+  quizForm!: FormGroup;
+  quizStarted = false;
+  // currentQuestionNumber!: number;
+  currentQuestionNumber$!: Observable<number | null>;
+  isFirstQuestion$!: Observable<boolean>;
+  totalQuestions!: number;
   score = 0;
+  isOptionSelected = false;
   currentQuestion = 'Who is the founder of Pakistan';
   options: string[] = [
     'Allama Iqbal',
@@ -33,97 +62,71 @@ export class AppComponent implements OnInit {
   previousAllowed = true;
   answered = false;
   selectedOption: string | undefined;
-
   showFooter = true;
-  questions!: Question[];
+  // questions!: Question[];
+  questions$!: Observable<Question[]>;
   finalScoreMessage: string | null = null;
   showFinalScore = false;
   selectedButton = false;
   correctAnswer!: string;
-
+  imgOptions: any[] = [];
+  choice: any;
+  types!: string;
+  optionWindowVisible = false;
   response!: string;
   triviaState$!: Observable<TriviaState>;
+  categories$!: Observable<Categories>;
+  selectCurrentQuestion$!: Observable<Question>;
+  nextBtn = 'Next';
 
   ngOnInit(): void {
+    this.categories$ = this.store.select(selectCategories);
+    this.questions$ = this.store.pipe(select(selectQuestions));
+    this.selectCurrentQuestion$ = this.store.pipe(
+      select(selectCurrentQuestion)
+    );
     this.triviaState$ = this.store.select(selectTriviaState);
+    this.currentQuestionNumber$ = this.store.pipe(
+      select(selectCurrentQuestionNumber)
+    );
     this.lastQuestion$ = this.store.select('lastQuestion');
+    this.quizForm = new FormGroup({
+      username: new FormControl(''),
+      categories: new FormControl([]),
+      difficulties: new FormControl(''),
+      totalQuestions: new FormControl(5),
+      type: new FormControl(''),
+    });
+    this.store.dispatch(QuizPageActions.loadCategories());
+    this.currentQuestionNumber$.subscribe((index) => {
+      if (index && index === this.totalQuestions) {
+        this.nextBtn = 'Complete';
+      }
+    });
+    this.isFirstQuestion$ = this.currentQuestionNumber$.pipe(
+      map((index) => index === 1)
+    );
+  }
+  toggleOptionWindow() {
+    this.optionWindowVisible = !this.optionWindowVisible;
+  }
+
+  setCurrentQuestion(index: number) {
+    this.store.dispatch(
+      QuizPageActions.setCurrentQuestion({ currentQuestionNumber: index })
+    );
+    console.log('select Question');
+  }
+
+  startQuiz() {
+    this.quizStarted = true;
+
+    this.store.dispatch(
+      QuizPageActions.submitForm({ formValue: this.quizForm.value })
+    );
+
     this.triviaSubscribe();
   }
-  // triviaSubscribe() {
-  //   this.triviaQuizService.getTrivia().subscribe((trivia: Question[]) => {
-  //     console.log(trivia);
-  //     this.questions = trivia;
-  //     this.totalQuestions = this.questions.length;
-  //     this.currentQuestion =
-  //       this.questions[this.currentQuestionNumber - 1].question.text;
-  //     this.options = this.questions[
-  //       this.currentQuestionNumber - 1
-  //     ].incorrectAnswers
-  //       .concat(this.questions[this.currentQuestionNumber - 1].correctAnswer)
-  //       .sort();
-  //   });
-  //   console.log(this.triviaQuizService);
-  // }
-
-  // nextQuestion(): void {
-  //   if (this.currentQuestionNumber < this.totalQuestions) {
-  //     this.currentQuestionNumber++;
-  //     const nextQuestion = this.questions[this.currentQuestionNumber - 1];
-  //     this.currentQuestion = nextQuestion.question.text;
-  //     this.options = nextQuestion.incorrectAnswers
-  //       .concat(nextQuestion.correctAnswer)
-  //       .sort();
-  //     this.selectedOption = undefined;
-  //     this.selectedButton = false;
-  //   } else {
-  //     this.showFooter = false;
-  //   }
-  // }
-  // skipQuestion() {
-  //   if (this.currentQuestionNumber < this.totalQuestions) {
-  //     this.currentQuestionNumber++;
-  //     const nextQuestion = this.questions[this.currentQuestionNumber - 1];
-  //     this.currentQuestion = nextQuestion.question.text;
-  //     this.options = nextQuestion.incorrectAnswers
-  //       .concat(nextQuestion.correctAnswer)
-  //       .sort();
-  //     this.selectedOption = undefined;
-  //   } else {
-  //     this.showFooter = false;
-  //   }
-  // }
-
-  // handleOption(guess: string) {
-  //   this.response = guess;
-
-  //   this.correctAnswer =
-  //     this.questions[this.currentQuestionNumber - 1].correctAnswer;
-  //   if (!this.answered) {
-  //     this.answered = true;
-  //     this.selectedButton = true;
-  //     console.log(this.answered);
-  //     if (
-  //       guess == this.questions[this.currentQuestionNumber - 1].correctAnswer
-  //     ) {
-  //       console.log(true);
-  //       this.score++;
-  //     } else {
-  //       console.log(false);
-  //     }
-  //     // this.answered= false;
-  //     console.log(this.questions[this.currentQuestionNumber - 1].correctAnswer);
-  //   } else {
-  //     this.selectedButton = false;
-  //   }
-  //   this.answered = false;
-  // }
-  // restartQuiz() {
-  //   this.triviaSubscribe();
-  //   this.selectedButton = false;
-  //   this.currentQuestionNumber = 1; // Reset current question number
-  //   this.score = 0; // Reset score
-  //   this.showFooter = true;
-  // }
 
   triviaSubscribe() {
     this.store.dispatch(QuizPageActions.loadTrivia());
@@ -132,6 +135,12 @@ export class AppComponent implements OnInit {
   // Replace nextQuestion, skipQuestion, and handleOption methods
   nextQuestion(): void {
     this.store.dispatch(QuizPageActions.nextQuestion());
+    this.isOptionSelected = false;
+    this.currentQuestionNumber$.subscribe((index) => {
+      if (index && index > this.totalQuestions) {
+        this.router.navigate(['/result']);
+      }
+    });
   }
 
   skipQuestion() {
@@ -140,6 +149,7 @@ export class AppComponent implements OnInit {
 
   handleOption(guess: string) {
     this.store.dispatch(QuizPageActions.answerQuestion({ guess }));
+    this.isOptionSelected = true;
   }
 
   // Restart quiz method
@@ -149,11 +159,81 @@ export class AppComponent implements OnInit {
   }
   previousQuestion() {
     this.store.dispatch(QuizPageActions.previousQuestion());
-    // if (this.currentQuestionNumber > 1) {
-    //   this.currentQuestionNumber--;
-    //   this.currentQuestion =
-    //     this.questions[this.currentQuestionNumber].question.text;
-    //   console.log(this.currentQuestionNumber);
-    // }
   }
 }
+
+// triviaSubscribe() {
+//   this.triviaQuizService.getTrivia().subscribe((trivia: Question[]) => {
+//     console.log(trivia);
+//     this.questions = trivia;
+//     this.totalQuestions = this.questions.length;
+//     this.currentQuestion =
+//       this.questions[this.currentQuestionNumber - 1].question.text;
+//     this.options = this.questions[
+//       this.currentQuestionNumber - 1
+//     ].incorrectAnswers
+//       .concat(this.questions[this.currentQuestionNumber - 1].correctAnswer)
+//       .sort();
+//   });
+//   console.log(this.triviaQuizService);
+// }
+
+// nextQuestion(): void {
+//   if (this.currentQuestionNumber < this.totalQuestions) {
+//     this.currentQuestionNumber++;
+//     const nextQuestion = this.questions[this.currentQuestionNumber - 1];
+//     this.currentQuestion = nextQuestion.question.text;
+//     this.options = nextQuestion.incorrectAnswers
+//       .concat(nextQuestion.correctAnswer)
+//       .sort();
+//     this.selectedOption = undefined;
+//     this.selectedButton = false;
+//   } else {
+//     this.showFooter = false;
+//   }
+// }
+// skipQuestion() {
+//   if (this.currentQuestionNumber < this.totalQuestions) {
+//     this.currentQuestionNumber++;
+//     const nextQuestion = this.questions[this.currentQuestionNumber - 1];
+//     this.currentQuestion = nextQuestion.question.text;
+//     this.options = nextQuestion.incorrectAnswers
+//       .concat(nextQuestion.correctAnswer)
+//       .sort();
+//     this.selectedOption = undefined;
+//   } else {
+//     this.showFooter = false;
+//   }
+// }
+
+// handleOption(guess: string) {
+//   this.response = guess;
+
+//   this.correctAnswer =
+//     this.questions[this.currentQuestionNumber - 1].correctAnswer;
+//   if (!this.answered) {
+//     this.answered = true;
+//     this.selectedButton = true;
+//     console.log(this.answered);
+//     if (
+//       guess == this.questions[this.currentQuestionNumber - 1].correctAnswer
+//     ) {
+//       console.log(true);
+//       this.score++;
+//     } else {
+//       console.log(false);
+//     }
+//     // this.answered= false;
+//     console.log(this.questions[this.currentQuestionNumber - 1].correctAnswer);
+//   } else {
+//     this.selectedButton = false;
+//   }
+//   this.answered = false;
+// }
+// restartQuiz() {
+//   this.triviaSubscribe();
+//   this.selectedButton = false;
+//   this.currentQuestionNumber = 1; // Reset current question number
+//   this.score = 0; // Reset score
+//   this.showFooter = true;
+// }

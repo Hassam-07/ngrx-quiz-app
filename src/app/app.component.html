@@ -1,34 +1,129 @@
 <div class="flex">
   <div class="wrapper">
-    <ng-container *ngIf="triviaState$ | async as trivia">
-      <!-- {{ trivia | json }} -->
-      <ng-container *ngIf="trivia.showFooter; else footer">
-        <quiz-app-quiz-head
-          [currentQuestionNumber]="trivia.currentQuestionNumber"
-          [totalQuestions]="trivia.totalQuestions"
-          [score]="trivia.score"
-        ></quiz-app-quiz-head>
-        <quiz-app-quiz-body
-          [correctAnswer]="trivia.correctAnswer"
-          [response]="trivia.response"
-          (optionClick)="handleOption($event)"
-          [currentQuestion]="trivia.currentQuestion"
-          [options]="trivia.options"
-        ></quiz-app-quiz-body>
-        <quiz-app-quiz-footer
-          [lastQuestion]="trivia.lastQuestion"
-          [previousAllowed]="previousAllowed"
-          (nextButton)="nextQuestion()"
-          (previousButton)="previousQuestion()"
-          (skipButton)="skipQuestion()"
-        ></quiz-app-quiz-footer>
-      </ng-container>
-      <ng-template #footer>
-        <quiz-app-quiz-result
-          (restartTrivia)="restartQuiz()"
-        ></quiz-app-quiz-result>
-        <router-outlet></router-outlet>
-      </ng-template>
+    <ng-container class="startQuizPage" *ngIf="!quizStarted; else quizContent">
+      <form [formGroup]="quizForm" (ngSubmit)="startQuiz()">
+        <div>
+          <label>
+            Username:
+            <input
+              placeholder="Enter Username"
+              type="text"
+              formControlName="username"
+            />
+          </label>
+        </div>
+        <div>
+          <label for="category"> Category: </label>
+
+          <div class="select select--multiple">
+            <select
+              id="multi-select-category"
+              formControlName="categories"
+              multiple
+            >
+              <option value="" disabled selected>Select categories</option>
+              <option
+                *ngFor="let category of categories$ | async | keyvalue"
+                [value]="category.key"
+              >
+                {{ category.key }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="difficulty"
+            >Difficulty:
+            <div class="select">
+              <select id="difficulty" formControlName="difficulties">
+                <option value="" disabled selected>Select Difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+          </label>
+        </div>
+        <div>
+          <label for="type"
+            >Type choice:
+            <div class="select">
+              <select id="type" formControlName="type">
+                <option value="" disabled selected>Select Type</option>
+                <option value="image_choice">Image choice</option>
+                <option value="text_choice">Text choice</option>
+              </select>
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <label for="totalQuestions"
+            >Total Questions:
+            <input
+              type="range"
+              id="totalQuestions"
+              formControlName="totalQuestions"
+              min="1"
+              max="20"
+              value="5"
+            />
+            <span>{{ quizForm.get('totalQuestions')?.value }}</span>
+          </label>
+        </div>
+
+        <button type="submit" [disabled]="quizForm.invalid">Start Quiz</button>
+      </form>
     </ng-container>
+    <ng-template #quizContent>
+      <ng-container *ngIf="triviaState$ | async as trivia">
+        <!-- {{ trivia | json }} -->
+        <ng-container *ngIf="trivia.showFooter; else footer">
+          <quiz-app-quiz-head
+            [currentQuestionNumber]="trivia.currentQuestionNumber"
+            [totalQuestions]="trivia.totalQuestions"
+            [score]="trivia.score"
+            (nextButton)="nextQuestion()"
+            (optionWindow)="toggleOptionWindow()"
+            (previousButton)="previousQuestion()"
+            (skipButton)="skipQuestion()"
+          ></quiz-app-quiz-head>
+          <quiz-app-quiz-body
+            [correctAnswer]="trivia.correctAnswer"
+            [response]="trivia.response"
+            [questions]="trivia.questions"
+            (questionClicked)="setCurrentQuestion($event)"
+            [currentQuestion]="
+              $any((selectCurrentQuestion$ | async)?.question?.text)
+            "
+            [options]="trivia.options"
+          ></quiz-app-quiz-body>
+          <ng-container *ngIf="optionWindowVisible" class="option-window">
+            <quiz-app-quiz-footer
+              (optionClick)="handleOption($event)"
+              [lastQuestion]="trivia.lastQuestion"
+              [nextBtn]="nextBtn"
+              [correctAnswer]="trivia.correctAnswer"
+              [response]="trivia.response"
+              [isOptionSelected]="isOptionSelected"
+              [options]="trivia.options"
+              [isFirstQuestion]="isFirstQuestion$ | async"
+              [previousAllowed]="previousAllowed"
+              (nextButton)="nextQuestion()"
+              (previousButton)="previousQuestion()"
+              (skipButton)="skipQuestion()"
+            ></quiz-app-quiz-footer>
+          </ng-container>
+        </ng-container>
+        <ng-template #footer>
+          <quiz-app-quiz-result
+            (restartTrivia)="restartQuiz()"
+          ></quiz-app-quiz-result>
+        </ng-template>
+      </ng-container>
+    </ng-template>
   </div>
 </div>
+
+<!-- <router-outlet></router-outlet> -->

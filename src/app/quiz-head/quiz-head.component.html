@@ -1,4 +1,4 @@
-<div class="quiz-head">
+<!-- <div class="quiz-head">
   <h1 class="quiz-title">Quiz Game</h1>
   <div class="flexbox">
     <div class="quiz-score flex">
@@ -8,5 +8,26 @@
     <div class="quiz-score flex">
       <span>Score: </span><span id="correct-score">{{ score }}</span>
     </div>
+  </div>
+</div> -->
+<div class="nav">
+  <div class="navbar">
+    <button
+      class="icon-button"
+      (click)="previousQuestion()"
+      [disabled]="isFirstQuestion"
+    >
+      <i class="fa fa-angle-left"></i>
+    </button>
+    <button class="ques-btn">
+      Question {{ currentQuestionNumber }}/{{ totalQuestions }}
+    </button>
+    <button class="icon-button" (click)="nextQuestion()">
+      <i class="fa fa-angle-right"></i>
+    </button>
+
+    <button class="option-panel" (click)="toggleOptionWindow()">
+      <i class="fas fa-check-square"></i>
+    </button>
   </div>
 </div>

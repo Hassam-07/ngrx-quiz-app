@@ -1,4 +1,4 @@
-<div class="footer">
+<!-- <div class="footer">
   <button
     [disabled]="!previousAllowed"
     type="button"
@@ -9,7 +9,6 @@
   </button>
   <ng-container>
     <button (click)="nextQuestion()" class="next-question">
-      <!-- Next -->
       <span *ngIf="!lastQuestion; else finishButton">Next</span>
     </button>
   </ng-container>
@@ -17,4 +16,46 @@
     <span>Finish</span>
   </ng-template>
   <button (click)="skipQuestion()" class="skip-question">Skip</button>
+</div> -->
+<div class="option-window">
+  <div class="radio-btns">
+    <div *ngFor="let option of options">
+      <input
+        type="radio"
+        name="options"
+        id="{{ 'option' }}"
+        (click)="handleOption(option)"
+        [disabled]="response"
+      />
+      <label
+        [ngClass]="{
+          correct: response && option === correctAnswer,
+          inCorrect:
+            response && response !== correctAnswer ? option === response : null
+        }"
+        for=""
+        >{{ option }}</label
+      >
+    </div>
+    <div class="btn-flex">
+      <!-- <button
+        class="next-btn"
+        (click)="previousQuestion()"
+        [disabled]="isFirstQuestion"
+      >
+        Previous
+      </button> -->
+      <button
+        [disabled]="isFirstQuestion"
+        type="button"
+        class="previous-question"
+        (click)="previousQuestion()"
+      >
+        Previous
+      </button>
+      <button class="next-btn" (click)="nextQuestion()">
+        {{ nextBtn }}
+      </button>
+    </div>
+  </div>
 </div>

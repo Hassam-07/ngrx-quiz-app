@@ -18,7 +18,11 @@ export const selectCurrentQuestionNumber = createSelector(
 
 export const selectTotalQuestions = createSelector(
   selectTriviaState,
-  (state: TriviaState) => state.totalQuestions
+  (state: TriviaState) => state.questions.length
+);
+export const selectCategories = createSelector(
+  selectTriviaState,
+  (state) => state.categories
 );
 
 export const selectScore = createSelector(
@@ -26,27 +30,45 @@ export const selectScore = createSelector(
   (state: TriviaState) => state.score
 );
 
+export const selectQuestions = createSelector(
+  selectTriviaState,
+  (state) => state.questions
+);
+
 export const selectCurrentQuestion = createSelector(
-  selectTriviaState,
-  (state: TriviaState) => state.currentQuestion
-);
+  selectQuestions,
+  selectCurrentQuestionNumber,
+  (questions, currentQuestionNumber) => {
+    console.log('hi', questions);
+    console.log('currentQuestionNumber:', currentQuestionNumber);
+    const adjustedIndex = currentQuestionNumber - 1;
 
-export const selectOptions = createSelector(
-  selectTriviaState,
-  (state: TriviaState) => state.options
+    return {
+      ...questions[adjustedIndex],
+      options:
+        questions[adjustedIndex]?.incorrectAnswers
+          .concat(questions[adjustedIndex]?.correctAnswer)
+          .sort() || [],
+    };
+  }
 );
-
-// export const selectSelectedButton = createSelector(
-//   selectTriviaState,
-//   (state: TriviaState) => state.selectedButton
-// );
 
 export const selectCorrectAnswer = createSelector(
-  selectTriviaState,
-  (state: TriviaState) => state.correctAnswer
+  selectCurrentQuestion,
+  (currentQuestion) => currentQuestion?.correctAnswer
 );
 
-export const selectResponse = createSelector(
+export const selectSelectedOption = createSelector(
   selectTriviaState,
-  (state: TriviaState) => state.response
+  (state) => {
+    console.log('selected', state.response);
+    return state.response;
+  }
+);
+export const selectUserResponses = createSelector(
+  selectTriviaState,
+  (state) => {
+    console.log('Responses saved as', state.userResponses);
+    return state.userResponses;
+  }
 );

@@ -1,19 +1,55 @@
-<h1>Trivia-quiz App</h1>
-<div class="main">
-  <h3 class="question">{{ currentQuestion }}</h3>
-
-  <div class="options">
-    <button
-      *ngFor="let option of options"
-      [disabled]="response"
-      (click)="handleOption(option)"
-      [ngClass]="{
-        correct: response && option === correctAnswer,
-        inCorrect:
-          response && response !== correctAnswer ? option === response : null
-      }"
-    >
-      {{ option }}
-    </button>
+<div class="side-btn">
+  <button (click)="openSideWindow()">
+    <i class="fa fa-angle-right"></i>
+  </button>
+</div>
+<div (click)="closeSideWindow()">
+  <div *ngIf="sideWindowVisible" class="side-window-container">
+    <div class="side-window" (click)="$event.stopPropagation()">
+      <div
+        *ngFor="let question of questions; let i = index"
+        class="window-flex"
+      >
+        <h3 (click)="setCurrentQuestion(i)">
+          {{ question.question.text }}
+        </h3>
+        <div class="attempted-question">
+          <i class="fa fa-check-circle"></i>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<div class="container">
+  <div class="quiz-flex">
+    <h3>
+      {{ currentQuestion }}
+    </h3>
+    <ul>
+      <li *ngFor="let option of options">
+        {{ option }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- <h1>Trivia-quiz App</h1> -->
+<!-- <div class="main">
+      <h3 class="question">{{ currentQuestion }}</h3>
+    
+      <div class="options">
+        <button
+          *ngFor="let option of options"
+          [disabled]="response"
+          (click)="handleOption(option)"
+          [ngClass]="{
+            correct: response && option === correctAnswer,
+            inCorrect:
+              response && response !== correctAnswer ? option === response : null
+          }"
+        >
+          {{ option }}
+        </button>
+      </div>
+    </div> -->
