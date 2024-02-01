@@ -10,19 +10,17 @@ export class QuizHeadComponent {
   @Input() totalQuestions!: number;
   @Input() score!: number;
   @Input() remainingTime = 0;
-  @Input() isFirstQuestion!: boolean;
+  @Input() isFirstQuestion!: boolean | null;
   @Output() nextButton = new EventEmitter();
   @Output() optionWindow = new EventEmitter();
   @Output() skipButton = new EventEmitter();
   @Output() previousButton = new EventEmitter();
 
-  optionWindowVisible = false;
+  @Input() optionWindowVisible!: boolean;
   toggleOptionWindow() {
     this.optionWindow.emit();
-    // this.optionWindowVisible = !this.optionWindowVisible;
   }
   nextQuestion() {
-    // console.log('Last Question:', this.lastQuestion);
     this.nextButton.emit();
   }
   skipQuestion() {

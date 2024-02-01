@@ -10,11 +10,11 @@
         *ngFor="let question of questions; let i = index"
         class="window-flex"
       >
-        <h3 (click)="setCurrentQuestion(i)">
+        <h3 (click)="setCurrentQuestion(i + 1)">
           {{ question.question.text }}
         </h3>
         <div class="attempted-question">
-          <i class="fa fa-check-circle"></i>
+          <i *ngIf="userResponses[i]" class="fa fa-check-circle"></i>
         </div>
       </div>
     </div>

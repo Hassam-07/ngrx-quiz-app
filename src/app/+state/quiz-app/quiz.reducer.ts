@@ -16,18 +16,21 @@ export interface TriviaState {
   currentQuestionNumber: number;
   totalQuestions: number;
   score: number;
-  showFooter: boolean;
+  quizQuestions: boolean;
   currentQuestion: string;
-  options: string[];
+  // options: string[];
   // answered: boolean;
   selectedOption: string | undefined;
   // selectedButton: boolean;
   correctAnswer: string;
   response: string;
-  lastQuestion: boolean;
+  // lastQuestion: boolean;
   previousAllowed: boolean;
   userResponses: string[];
   categories: Categories;
+  sideWindowVisible: boolean;
+  optionWindowVisible: boolean;
+  nextBtn: string;
 }
 
 export const initialState: TriviaState = {
@@ -35,18 +38,21 @@ export const initialState: TriviaState = {
   currentQuestionNumber: 1,
   totalQuestions: 1,
   score: 0,
-  showFooter: true,
+  quizQuestions: true,
   currentQuestion: '',
-  options: [],
+  // options: [],
   // answered: false,
   selectedOption: undefined,
   // selectedButton: false,
   correctAnswer: '',
   response: '',
-  lastQuestion: false,
+  // lastQuestion: false,
   previousAllowed: false,
   userResponses: [],
   categories: {},
+  sideWindowVisible: false,
+  optionWindowVisible: false,
+  nextBtn: 'Next',
 };
 
 export const quizReducer = createReducer(
@@ -65,48 +71,48 @@ export const quizReducer = createReducer(
     const currentQuestionIndex = state.currentQuestionNumber;
     const nextQuestion = state.questions[currentQuestionIndex];
     const currentResponse = state.userResponses[currentQuestionIndex] || '';
-    const correctAnswer = nextQuestion.correctAnswer;
+    console.log(nextQuestion);
+    // const correctAnswer = nextQuestion.correctAnswer;
     if (state.currentQuestionNumber < state.totalQuestions) {
-      const nextQuestion = state.questions[state.currentQuestionNumber];
-      console.log('Last Question in reducer:', state.lastQuestion);
-
+      // const nextQuestion = state.questions[state.currentQuestionNumber];
+      // console.log('Last Question in reducer:', state.lastQuestion);
+      let nextBtn = state.nextBtn;
+      if (state.currentQuestionNumber === state.totalQuestions - 1) {
+        nextBtn = 'Finish';
+      }
       // Save the response before moving to the next question
       const updatedUserResponses = [...state.userResponses];
       updatedUserResponses[currentQuestionIndex] = currentResponse;
+
       return {
         ...state,
         currentQuestionNumber: state.currentQuestionNumber + 1,
-        // currentQuestion: nextQuestion.question.text,
-        options: nextQuestion.incorrectAnswers
-          .concat(nextQuestion.correctAnswer)
-          .sort(),
         selectedOption: undefined,
-        lastQuestion: false,
         response: currentResponse,
         userResponses: updatedUserResponses,
-        correctAnswer,
+        // correctAnswer: nextQuestion?.correctAnswer || '',
+        nextBtn,
       };
     } else {
       console.log('Setting lastQuestion to true in reducer');
       return {
         ...state,
-        showFooter: false,
-        lastQuestion: true,
+        quizQuestions: false,
         response: currentResponse,
-        correctAnswer: '',
+        // correctAnswer: '',
       };
     }
   }),
   on(QuizPageActions.skipQuestion, (state) => {
     if (state.currentQuestionNumber < state.totalQuestions) {
-      const nextQuestion = state.questions[state.currentQuestionNumber];
+      // const nextQuestion = state.questions[state.currentQuestionNumber];
       return {
         ...state,
         currentQuestionNumber: state.currentQuestionNumber + 1,
         // currentQuestion: nextQuestion.question.text,
-        options: nextQuestion.incorrectAnswers
-          .concat(nextQuestion.correctAnswer)
-          .sort(),
+        // options: nextQuestion.incorrectAnswers
+        //   .concat(nextQuestion.correctAnswer)
+        //   .sort(),
         selectedOption: undefined,
       };
     } else {
@@ -124,9 +130,9 @@ export const quizReducer = createReducer(
         ...state,
         currentQuestionNumber: state.currentQuestionNumber - 1,
         // currentQuestion: previousQuestion.question.text,
-        options: previousQuestion.incorrectAnswers
-          .concat(previousQuestion.correctAnswer)
-          .sort(),
+        // options: previousQuestion.incorrectAnswers
+        //   .concat(previousQuestion.correctAnswer)
+        //   .sort(),
         selectedOption: response || undefined,
         response,
         correctAnswer,
@@ -171,10 +177,10 @@ export const quizReducer = createReducer(
   })),
   on(QuizPageActions.setCurrentQuestion, (state, { currentQuestionNumber }) => {
     if (
-      currentQuestionNumber > 0 &&
-      currentQuestionNumber <= state.questions.length
+      state.currentQuestionNumber > 0 &&
+      state.currentQuestionNumber <= state.questions.length
     ) {
-      const currentQuestion = state.questions[currentQuestionNumber - 1];
+      const currentQuestion = state.questions[state.currentQuestionNumber - 1];
       return {
         ...state,
         currentQuestion: currentQuestion.question.text,
@@ -185,5 +191,23 @@ export const quizReducer = createReducer(
       };
     }
     return state;
-  })
+  }),
+  on(QuizPageActions.openSideWindow, (state) => ({
+    ...state,
+    sideWindowVisible: true,
+    optionWindowVisible: false,
+  })),
+  on(QuizPageActions.closeSideWindow, (state) => ({
+    ...state,
+    sideWindowVisible: false,
+  })),
+  on(QuizPageActions.toggleOptionWindow, (state) => ({
+    ...state,
+    optionWindowVisible: !state.optionWindowVisible,
+    sideWindowVisible: false,
+  })),
+  on(QuizPageActions.updateNextButton, (state, { nextBtn }) => ({
+    ...state,
+    nextBtn,
+  }))
 );

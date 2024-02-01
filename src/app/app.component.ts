@@ -13,14 +13,17 @@ import {
   QuizPageActions,
 } from './+state/quiz-app/quizApp.actions';
 
-import { Observable, map } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { TriviaState } from './+state/quiz-app/quiz.reducer';
 import {
   selectCategories,
   selectCurrentQuestion,
   selectCurrentQuestionNumber,
+  selectNextBtn,
+  selectOptionWindowVisible,
   selectQuestions,
+  selectSideWindowVisible,
   selectTotalQuestions,
   selectTriviaState,
 } from './+state/quiz-app/quiz.selectors';
@@ -62,7 +65,7 @@ export class AppComponent implements OnInit {
   previousAllowed = true;
   answered = false;
   selectedOption: string | undefined;
-  showFooter = true;
+  quizQuestions = true;
   // questions!: Question[];
   questions$!: Observable<Question[]>;
   finalScoreMessage: string | null = null;
@@ -72,14 +75,30 @@ export class AppComponent implements OnInit {
   imgOptions: any[] = [];
   choice: any;
   types!: string;
-  optionWindowVisible = false;
   response!: string;
   triviaState$!: Observable<TriviaState>;
   categories$!: Observable<Categories>;
   selectCurrentQuestion$!: Observable<Question>;
-  nextBtn = 'Next';
+  // selectCurrentQuestionNumber$!: Observable<number>;
+  // nextBtn = 'Next';
+  nextBtn$!: Observable<string>;
+  // optionWindowVisible = false;
+  // sideWindowVisible = false;
+  sideWindowVisible$!: Observable<boolean>;
+  optionWindowVisible$!: Observable<boolean>;
+  options$!: Observable<string[]>;
 
   ngOnInit(): void {
+    this.nextBtn$ = this.store.pipe(select(selectNextBtn));
+    this.sideWindowVisible$ = this.store.select(selectSideWindowVisible);
+    this.options$ = this.store.pipe(
+      select(selectCurrentQuestion),
+      map((question) => question.options)
+    );
+    // this.selectCurrentQuestionNumber$ = this.store.select(
+    //   selectCurrentQuestionNumber
+    // );
+    this.optionWindowVisible$ = this.store.select(selectOptionWindowVisible);
     this.categories$ = this.store.select(selectCategories);
     this.questions$ = this.store.pipe(select(selectQuestions));
     this.selectCurrentQuestion$ = this.store.pipe(
@@ -89,7 +108,7 @@ export class AppComponent implements OnInit {
     this.currentQuestionNumber$ = this.store.pipe(
       select(selectCurrentQuestionNumber)
     );
-    this.lastQuestion$ = this.store.select('lastQuestion');
+    // this.lastQuestion$ = this.store.select('lastQuestion');
     this.quizForm = new FormGroup({
       username: new FormControl(''),
       categories: new FormControl([]),
@@ -98,26 +117,33 @@ export class AppComponent implements OnInit {
       type: new FormControl(''),
     });
     this.store.dispatch(QuizPageActions.loadCategories());
-    this.currentQuestionNumber$.subscribe((index) => {
-      if (index && index === this.totalQuestions) {
-        this.nextBtn = 'Complete';
-      }
-    });
+    // this.currentQuestionNumber$.subscribe((index) => {
+    //   if (index && index === this.totalQuestions) {
+    //     this.nextBtn = 'Complete';
+    //   }
+    // });
     this.isFirstQuestion$ = this.currentQuestionNumber$.pipe(
       map((index) => index === 1)
     );
   }
   toggleOptionWindow() {
-    this.optionWindowVisible = !this.optionWindowVisible;
+    this.store.dispatch(QuizPageActions.toggleOptionWindow());
+  }
+  updateNextBtn(nextBtn: string): void {
+    this.store.dispatch(QuizPageActions.updateNextButton({ nextBtn }));
   }
 
-  setCurrentQuestion(index: number) {
+  setCurrentQuestion(currentQuestionNumber: number) {
     this.store.dispatch(
-      QuizPageActions.setCurrentQuestion({ currentQuestionNumber: index })
+      QuizPageActions.setCurrentQuestion({ currentQuestionNumber })
     );
-    console.log('select Question');
   }
-
+  openSideWindow() {
+    this.store.dispatch(QuizPageActions.openSideWindow());
+  }
+  closeSideWindow() {
+    this.store.dispatch(QuizPageActions.closeSideWindow());
+  }
   startQuiz() {
     this.quizStarted = true;
 
@@ -132,15 +158,8 @@ export class AppComponent implements OnInit {
     this.store.dispatch(QuizPageActions.loadTrivia());
   }
 
-  // Replace nextQuestion, skipQuestion, and handleOption methods
   nextQuestion(): void {
     this.store.dispatch(QuizPageActions.nextQuestion());
-    this.isOptionSelected = false;
-    this.currentQuestionNumber$.subscribe((index) => {
-      if (index && index > this.totalQuestions) {
-        this.router.navigate(['/result']);
-      }
-    });
   }
 
   skipQuestion() {
@@ -149,7 +168,6 @@ export class AppComponent implements OnInit {
 
   handleOption(guess: string) {
     this.store.dispatch(QuizPageActions.answerQuestion({ guess }));
-    this.isOptionSelected = true;
   }
 
   // Restart quiz method

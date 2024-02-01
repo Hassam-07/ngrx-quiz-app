@@ -7,33 +7,25 @@ import { Question } from 'lib/src/lib/quiz-interface/quizApp.models';
   styleUrls: ['./quiz-body.component.scss'],
 })
 export class QuizBodyComponent {
-  @Input() response!: string;
+  @Input() userResponses!: string[];
   @Input() currentQuestion = '';
   @Input() questions: Question[] = [];
   @Input() options: string[] = [];
   @Input() correctAnswer!: string;
   @Input() remainingTime = 0;
-  // @Input() selectedButton!: boolean;
   @Input() choiceType!: string;
-  sideWindowVisible = false;
-  @Output() nextButton = new EventEmitter();
-  @Output() optionClick = new EventEmitter();
+  @Input() sideWindowVisible!: boolean;
+  @Output() openSideNav = new EventEmitter();
+  @Output() closeSideNav = new EventEmitter();
   @Output() questionClicked = new EventEmitter<any>();
-  handleOption(event: string) {
-    this.optionClick.emit(event);
-    console.log(event);
-  }
 
-  nextQuestion() {
-    this.nextButton.emit();
-  }
   setCurrentQuestion(index: number) {
     this.questionClicked.emit(index);
   }
   openSideWindow() {
-    this.sideWindowVisible = true;
+    this.openSideNav.emit();
   }
   closeSideWindow() {
-    this.sideWindowVisible = false;
+    this.closeSideNav.emit();
   }
 }

@@ -6,9 +6,9 @@ export const selectTriviaState =
   createFeatureSelector<TriviaState>(QUIZ_FEATURE_KEY);
 
 // Selectors for different parts of the state
-export const selectShowFooter = createSelector(
+export const selectQuizQuestions = createSelector(
   selectTriviaState,
-  (state: TriviaState) => state.showFooter
+  (state: TriviaState) => state.quizQuestions
 );
 
 export const selectCurrentQuestionNumber = createSelector(
@@ -52,6 +52,10 @@ export const selectCurrentQuestion = createSelector(
     };
   }
 );
+export const selectNextBtn = createSelector(
+  selectTriviaState,
+  (state) => state.nextBtn
+);
 
 export const selectCorrectAnswer = createSelector(
   selectCurrentQuestion,
@@ -71,4 +75,13 @@ export const selectUserResponses = createSelector(
     console.log('Responses saved as', state.userResponses);
     return state.userResponses;
   }
+);
+export const selectSideWindowVisible = createSelector(
+  selectTriviaState,
+  (state) => state.sideWindowVisible
+);
+
+export const selectOptionWindowVisible = createSelector(
+  selectTriviaState,
+  (state) => state.optionWindowVisible
 );

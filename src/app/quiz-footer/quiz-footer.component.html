@@ -38,13 +38,6 @@
       >
     </div>
     <div class="btn-flex">
-      <!-- <button
-        class="next-btn"
-        (click)="previousQuestion()"
-        [disabled]="isFirstQuestion"
-      >
-        Previous
-      </button> -->
       <button
         [disabled]="isFirstQuestion"
         type="button"
@@ -53,9 +46,18 @@
       >
         Previous
       </button>
-      <button class="next-btn" (click)="nextQuestion()">
+      <!-- <button class="next-btn" (click)="nextQuestion()">
         {{ nextBtn }}
-      </button>
+      </button> -->
+      <ng-container>
+        <button (click)="nextQuestion()" class="next-btn">
+          <span *ngIf="!lastQuestion; else finishButton">{{ nextBtn }}</span>
+        </button>
+      </ng-container>
+
+      <ng-template #finishButton>
+        <span>Finish</span>
+      </ng-template>
     </div>
   </div>
 </div>
