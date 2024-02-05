@@ -29,5 +29,8 @@
     <button class="option-panel" (click)="toggleOptionWindow()">
       <i class="fas fa-check-square"></i>
     </button>
+    <div class="timer">
+      <p>{{ remainingTime | timeFormat }}</p>
+    </div>
   </div>
 </div>

@@ -13,14 +13,14 @@ import {
   QuizPageActions,
 } from './+state/quiz-app/quizApp.actions';
 
-import { Observable, map, take } from 'rxjs';
+import { Observable, Subscription, map, take } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { TriviaState } from './+state/quiz-app/quiz.reducer';
 import {
   selectCategories,
+  selectCorrectAnswer,
   selectCurrentQuestion,
   selectCurrentQuestionNumber,
-  selectNextBtn,
   selectOptionWindowVisible,
   selectQuestions,
   selectSideWindowVisible,
@@ -51,7 +51,8 @@ export class AppComponent implements OnInit {
   // currentQuestionNumber!: number;
   currentQuestionNumber$!: Observable<number | null>;
   isFirstQuestion$!: Observable<boolean>;
-  totalQuestions!: number;
+  // totalQuestions!: number;
+  totalQuestions$!: Observable<number>;
   score = 0;
   isOptionSelected = false;
   currentQuestion = 'Who is the founder of Pakistan';
@@ -71,7 +72,8 @@ export class AppComponent implements OnInit {
   finalScoreMessage: string | null = null;
   showFinalScore = false;
   selectedButton = false;
-  correctAnswer!: string;
+  // correctAnswer!: string;
+  correctAnswer$!: Observable<string>;
   imgOptions: any[] = [];
   choice: any;
   types!: string;
@@ -79,6 +81,9 @@ export class AppComponent implements OnInit {
   triviaState$!: Observable<TriviaState>;
   categories$!: Observable<Categories>;
   selectCurrentQuestion$!: Observable<Question>;
+  timer: Subscription | undefined;
+  remainingTime = 0;
+  timerInterval: any;
   // selectCurrentQuestionNumber$!: Observable<number>;
   // nextBtn = 'Next';
   nextBtn$!: Observable<string>;
@@ -89,8 +94,9 @@ export class AppComponent implements OnInit {
   options$!: Observable<string[]>;
 
   ngOnInit(): void {
-    this.nextBtn$ = this.store.pipe(select(selectNextBtn));
     this.sideWindowVisible$ = this.store.select(selectSideWindowVisible);
+    this.correctAnswer$ = this.store.select(selectCorrectAnswer);
+    this.totalQuestions$ = this.store.select(selectTotalQuestions);
     this.options$ = this.store.pipe(
       select(selectCurrentQuestion),
       map((question) => question.options)
@@ -129,9 +135,9 @@ export class AppComponent implements OnInit {
   toggleOptionWindow() {
     this.store.dispatch(QuizPageActions.toggleOptionWindow());
   }
-  updateNextBtn(nextBtn: string): void {
-    this.store.dispatch(QuizPageActions.updateNextButton({ nextBtn }));
-  }
+  // updateNextBtn(nextBtn: string): void {
+  //   this.store.dispatch(QuizPageActions.updateNextButton({ nextBtn }));
+  // }
 
   setCurrentQuestion(currentQuestionNumber: number) {
     this.store.dispatch(
@@ -156,6 +162,23 @@ export class AppComponent implements OnInit {
 
   triviaSubscribe() {
     this.store.dispatch(QuizPageActions.loadTrivia());
+    const totalTimeInSeconds = this.quizForm.value.totalQuestions * 10; // Calculate total time in seconds
+    this.remainingTime = totalTimeInSeconds; // Set the remaining time initially
+    console.log(this.quizForm.value);
+    // Start the timer
+    this.timerInterval = setInterval(() => {
+      this.remainingTime--;
+      if (this.remainingTime <= 0) {
+        clearInterval(this.timerInterval); // Stop the timer
+        // this.showFinalScore = true;
+        this.quizQuestions = false;
+        // this.finalScoreMessage = 'Time is up! Quiz ended.';
+        console.log(this.quizQuestions);
+        return;
+      }
+    }, 1000);
+    console.log(this.quizQuestions);
+    this.quizForm.reset();
   }
 
   nextQuestion(): void {

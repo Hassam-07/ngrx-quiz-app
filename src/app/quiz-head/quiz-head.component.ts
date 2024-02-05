@@ -10,6 +10,7 @@ export class QuizHeadComponent {
   @Input() totalQuestions!: number;
   @Input() score!: number;
   @Input() remainingTime = 0;
+  @Input() timerInterval: any;
   @Input() isFirstQuestion!: boolean | null;
   @Output() nextButton = new EventEmitter();
   @Output() optionWindow = new EventEmitter();

@@ -51,7 +51,13 @@
       </button> -->
       <ng-container>
         <button (click)="nextQuestion()" class="next-btn">
-          <span *ngIf="!lastQuestion; else finishButton">{{ nextBtn }}</span>
+          <span
+            *ngIf="
+              currentQuestionNumber === totalQuestions - 1;
+              else finishButton
+            "
+            >Next</span
+          >
         </button>
       </ng-container>
 

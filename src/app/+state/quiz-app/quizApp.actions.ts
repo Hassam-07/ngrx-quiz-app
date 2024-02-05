@@ -16,7 +16,6 @@ export const QuizPageActions = createActionGroup({
     'Open Side Window': emptyProps(),
     'Close Side Window': emptyProps(),
     'Toggle Option Window': emptyProps(),
-    'Update Next Button': props<{ nextBtn: string }>(),
     'submit Form': props<{ formValue: any }>(),
     'set Current Question': props<{ currentQuestionNumber: number }>(),
   },

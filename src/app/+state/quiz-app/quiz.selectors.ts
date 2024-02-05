@@ -52,10 +52,6 @@ export const selectCurrentQuestion = createSelector(
     };
   }
 );
-export const selectNextBtn = createSelector(
-  selectTriviaState,
-  (state) => state.nextBtn
-);
 
 export const selectCorrectAnswer = createSelector(
   selectCurrentQuestion,

@@ -17,6 +17,7 @@ import { QuizEffects } from './+state/quiz-app/quiz.effects';
 import { HttpClientModule } from '@angular/common/http';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { QuizResultComponent } from './quiz-result/quiz-result.component';
+import { TimeFormatPipe } from './time-format.pipe';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { QuizResultComponent } from './quiz-result/quiz-result.component';
     QuizBodyComponent,
     QuizFooterComponent,
     QuizResultComponent,
+    TimeFormatPipe,
   ],
   imports: [
     BrowserModule,

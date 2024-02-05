@@ -6,11 +6,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./quiz-footer.component.scss'],
 })
 export class QuizFooterComponent {
-  @Input() lastQuestion = false;
-  @Input() previousAllowed = false;
+  // @Input() lastQuestion = false;
+  // @Input() previousAllowed = false;
+  @Input() currentQuestionNumber = 1;
+  @Input() totalQuestions!: number;
   @Input() options: string[] = [];
   @Input() response!: string;
-  @Input() nextBtn!: string;
+  // @Input() nextBtn!: string;
   @Input() correctAnswer!: string;
   @Output() skipButton = new EventEmitter();
   @Output() nextButton = new EventEmitter();
@@ -25,7 +27,7 @@ export class QuizFooterComponent {
     console.log(event);
   }
   nextQuestion() {
-    console.log('Last Question:', this.lastQuestion);
+    // console.log('Last Question:', this.lastQuestion);
     this.nextButton.emit();
   }
   skipQuestion() {
