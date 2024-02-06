@@ -147,6 +147,7 @@ export const quizReducer = createReducer(
   on(QuizPageActions.restartQuiz, (state) => ({
     ...state,
     ...initialState,
+    quizQuestions: true,
   })),
   on(QuizApiActions.loadCategoriesSuccess, (state, { categories }) => ({
     ...state,

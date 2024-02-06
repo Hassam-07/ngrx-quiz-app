@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Question } from 'lib/src/lib/quiz-interface/quizApp.models';
 
 @Component({
   selector: 'quiz-app-quiz-footer',
@@ -13,6 +14,7 @@ export class QuizFooterComponent {
   @Input() options: string[] = [];
   @Input() response!: string;
   // @Input() nextBtn!: string;
+  @Input() questions: Question[] = [];
   @Input() correctAnswer!: string;
   @Output() skipButton = new EventEmitter();
   @Output() nextButton = new EventEmitter();

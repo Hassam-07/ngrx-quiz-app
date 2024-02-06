@@ -81,3 +81,42 @@ export const selectOptionWindowVisible = createSelector(
   selectTriviaState,
   (state) => state.optionWindowVisible
 );
+
+export const selectQuizView = createSelector(
+  selectQuestions,
+  selectCurrentQuestion,
+  selectScore,
+  selectCurrentQuestionNumber,
+  selectTotalQuestions,
+  selectSideWindowVisible,
+  selectOptionWindowVisible,
+  selectSelectedOption,
+  selectUserResponses,
+  selectCorrectAnswer,
+  selectQuizQuestions,
+  (
+    questions,
+    currentQuestion,
+    score,
+    questionNumber,
+    totalQuestions,
+    questionPanel,
+    answerPanel,
+    response,
+    userResponses,
+    correctAnswer,
+    quizQuestions
+  ) => ({
+    questions,
+    currentQuestion,
+    score,
+    questionNumber,
+    totalQuestions,
+    questionPanel,
+    answerPanel,
+    response,
+    userResponses,
+    correctAnswer,
+    quizQuestions,
+  })
+);

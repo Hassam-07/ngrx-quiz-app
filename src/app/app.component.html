@@ -77,44 +77,41 @@
       </form>
     </ng-container>
     <ng-template #quizContent>
-      <ng-container *ngIf="triviaState$ | async as trivia">
+      <ng-container *ngIf="quizViewState$ | async as trivia">
         <!-- {{ trivia | json }} -->
         <ng-container *ngIf="trivia.quizQuestions; else result">
           <quiz-app-quiz-head
-            [currentQuestionNumber]="trivia.currentQuestionNumber"
+            [currentQuestionNumber]="trivia.questionNumber"
             [totalQuestions]="trivia.questions.length"
             [score]="trivia.score"
             [isFirstQuestion]="isFirstQuestion$ | async"
-            [optionWindowVisible]="$any(optionWindowVisible$ | async)"
+            [optionWindowVisible]="trivia.answerPanel"
             (nextButton)="nextQuestion()"
             (optionWindow)="toggleOptionWindow()"
             (previousButton)="previousQuestion()"
             (skipButton)="skipQuestion()"
             [remainingTime]="remainingTime"
+            [timerInterval]="timerInterval"
           ></quiz-app-quiz-head>
           <quiz-app-quiz-body
             (openSideNav)="openSideWindow()"
             (closeSideNav)="closeSideWindow()"
-            [correctAnswer]="$any(correctAnswer$ | async)"
+            [correctAnswer]="trivia.correctAnswer"
             [userResponses]="trivia.userResponses"
-            [sideWindowVisible]="$any(sideWindowVisible$ | async)"
+            [sideWindowVisible]="trivia.questionPanel"
             [questions]="trivia.questions"
             (questionClicked)="setCurrentQuestion($event)"
-            [currentQuestion]="
-              $any((selectCurrentQuestion$ | async)?.question?.text)
-            "
+            [currentQuestion]="trivia.currentQuestion.question?.text"
             [options]="$any(options$ | async)"
           ></quiz-app-quiz-body>
-          <ng-container
-            *ngIf="optionWindowVisible$ | async"
-            class="option-window"
-          >
+          <ng-container *ngIf="trivia.answerPanel" class="option-window">
             <!-- [lastQuestion]="trivia.lastQuestion" -->
             <quiz-app-quiz-footer
               (optionClick)="handleOption($event)"
-              [currentQuestionNumber]="trivia.currentQuestionNumber"
-              [correctAnswer]="$any(correctAnswer$ | async)"
-              [totalQuestions]="$any(totalQuestions$ | async)"
+              [questions]="trivia.questions"
+              [currentQuestionNumber]="trivia.questionNumber"
+              [correctAnswer]="trivia.correctAnswer"
+              [totalQuestions]="trivia.totalQuestions"
               [response]="trivia.response"
               [isOptionSelected]="isOptionSelected"
               [options]="$any(options$ | async)"
@@ -128,6 +125,8 @@
         <ng-template #result>
           <quiz-app-quiz-result
             (restartTrivia)="restartQuiz()"
+            [questions]="trivia.questions"
+            [score]="trivia.score"
           ></quiz-app-quiz-result>
         </ng-template>
       </ng-container>
@@ -135,4 +134,4 @@
   </div>
 </div>
 
-<!-- <router-outlet></router-outlet> -->
+<router-outlet></router-outlet>

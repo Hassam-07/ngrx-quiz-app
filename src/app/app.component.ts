@@ -23,6 +23,7 @@ import {
   selectCurrentQuestionNumber,
   selectOptionWindowVisible,
   selectQuestions,
+  selectQuizView,
   selectSideWindowVisible,
   selectTotalQuestions,
   selectTriviaState,
@@ -40,7 +41,6 @@ import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  // constructor(private triviaQuizService: QuizAppService) {}
   constructor(
     private store: Store<TriviaState>,
     private router: Router,
@@ -48,73 +48,41 @@ export class AppComponent implements OnInit {
   ) {}
   quizForm!: FormGroup;
   quizStarted = false;
-  // currentQuestionNumber!: number;
   currentQuestionNumber$!: Observable<number | null>;
   isFirstQuestion$!: Observable<boolean>;
-  // totalQuestions!: number;
   totalQuestions$!: Observable<number>;
   score = 0;
   isOptionSelected = false;
-  currentQuestion = 'Who is the founder of Pakistan';
-  options: string[] = [
-    'Allama Iqbal',
-    'Quaid e Azam',
-    'Imran Khan',
-    'Sir Syed',
-  ];
-  lastQuestion$!: Observable<boolean>;
+  // currentQuestion = 'Who is the founder of Pakistan';
+  // options: string[] = [
+  //   'Allama Iqbal',
+  //   'Quaid e Azam',
+  //   'Imran Khan',
+  //   'Sir Syed',
+  // ];
+  // lastQuestion$!: Observable<boolean>;
   previousAllowed = true;
   answered = false;
   selectedOption: string | undefined;
   quizQuestions = true;
-  // questions!: Question[];
-  questions$!: Observable<Question[]>;
-  finalScoreMessage: string | null = null;
-  showFinalScore = false;
-  selectedButton = false;
-  // correctAnswer!: string;
-  correctAnswer$!: Observable<string>;
-  imgOptions: any[] = [];
-  choice: any;
-  types!: string;
   response!: string;
-  triviaState$!: Observable<TriviaState>;
+  quizViewState$!: Observable<any>;
   categories$!: Observable<Categories>;
-  selectCurrentQuestion$!: Observable<Question>;
   timer: Subscription | undefined;
   remainingTime = 0;
   timerInterval: any;
-  // selectCurrentQuestionNumber$!: Observable<number>;
-  // nextBtn = 'Next';
-  nextBtn$!: Observable<string>;
-  // optionWindowVisible = false;
-  // sideWindowVisible = false;
-  sideWindowVisible$!: Observable<boolean>;
-  optionWindowVisible$!: Observable<boolean>;
   options$!: Observable<string[]>;
 
   ngOnInit(): void {
-    this.sideWindowVisible$ = this.store.select(selectSideWindowVisible);
-    this.correctAnswer$ = this.store.select(selectCorrectAnswer);
-    this.totalQuestions$ = this.store.select(selectTotalQuestions);
     this.options$ = this.store.pipe(
       select(selectCurrentQuestion),
       map((question) => question.options)
     );
-    // this.selectCurrentQuestionNumber$ = this.store.select(
-    //   selectCurrentQuestionNumber
-    // );
-    this.optionWindowVisible$ = this.store.select(selectOptionWindowVisible);
     this.categories$ = this.store.select(selectCategories);
-    this.questions$ = this.store.pipe(select(selectQuestions));
-    this.selectCurrentQuestion$ = this.store.pipe(
-      select(selectCurrentQuestion)
+    this.quizViewState$ = this.store.select(selectQuizView);
+    this.currentQuestionNumber$ = this.store.select(
+      selectCurrentQuestionNumber
     );
-    this.triviaState$ = this.store.select(selectTriviaState);
-    this.currentQuestionNumber$ = this.store.pipe(
-      select(selectCurrentQuestionNumber)
-    );
-    // this.lastQuestion$ = this.store.select('lastQuestion');
     this.quizForm = new FormGroup({
       username: new FormControl(''),
       categories: new FormControl([]),
@@ -123,11 +91,6 @@ export class AppComponent implements OnInit {
       type: new FormControl(''),
     });
     this.store.dispatch(QuizPageActions.loadCategories());
-    // this.currentQuestionNumber$.subscribe((index) => {
-    //   if (index && index === this.totalQuestions) {
-    //     this.nextBtn = 'Complete';
-    //   }
-    // });
     this.isFirstQuestion$ = this.currentQuestionNumber$.pipe(
       map((index) => index === 1)
     );
@@ -135,10 +98,6 @@ export class AppComponent implements OnInit {
   toggleOptionWindow() {
     this.store.dispatch(QuizPageActions.toggleOptionWindow());
   }
-  // updateNextBtn(nextBtn: string): void {
-  //   this.store.dispatch(QuizPageActions.updateNextButton({ nextBtn }));
-  // }
-
   setCurrentQuestion(currentQuestionNumber: number) {
     this.store.dispatch(
       QuizPageActions.setCurrentQuestion({ currentQuestionNumber })
@@ -158,6 +117,7 @@ export class AppComponent implements OnInit {
     );
 
     this.triviaSubscribe();
+    this.router.navigate(['/quizstart']);
   }
 
   triviaSubscribe() {
@@ -172,12 +132,13 @@ export class AppComponent implements OnInit {
         clearInterval(this.timerInterval); // Stop the timer
         // this.showFinalScore = true;
         this.quizQuestions = false;
+        // this.restartQuiz();
         // this.finalScoreMessage = 'Time is up! Quiz ended.';
         console.log(this.quizQuestions);
         return;
       }
     }, 1000);
-    console.log(this.quizQuestions);
+    // console.log(this.quizQuestions);
     this.quizForm.reset();
   }
 
@@ -195,8 +156,10 @@ export class AppComponent implements OnInit {
 
   // Restart quiz method
   restartQuiz() {
-    this.triviaSubscribe();
+    this.quizStarted = false;
+    this.quizForm.reset();
     this.store.dispatch(QuizPageActions.restartQuiz());
+    this.router.navigate(['/']);
   }
   previousQuestion() {
     this.store.dispatch(QuizPageActions.previousQuestion());

@@ -8,7 +8,7 @@ export const appRoutes: Route[] = [
     component: QuizResultComponent,
   },
   {
-    path: '',
+    path: 'quizstart',
     component: AppComponent,
   },
 ];
