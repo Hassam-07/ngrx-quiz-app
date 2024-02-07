@@ -1,0 +1,60 @@
+<div class="container">
+  <div class="result">
+    <h1>Quiz User Login</h1>
+    <form [formGroup]="quizForm" (ngSubmit)="startQuiz()">
+      <label class="mb-4" for="username">Username:</label>
+      <input
+        placeholder="Enter Username"
+        type="text"
+        id="username"
+        formControlName="username"
+      />
+
+      <div>
+        <label class="mb-4" for="difficulty">Difficulty:</label>
+        <ng-select formControlName="difficulties">
+          <ng-option value="" disabled selected>Select Difficulty</ng-option>
+          <ng-option value="easy">Easy</ng-option>
+          <ng-option value="medium">Medium</ng-option>
+          <ng-option value="hard">Hard</ng-option>
+        </ng-select>
+      </div>
+
+      <div>
+        <label class="mb-4" for="category">Category:</label>
+        <ng-select formControlName="categories" [multiple]="true">
+          <ng-option [value]="" disabled selected>Select categories</ng-option>
+          <ng-option
+            *ngFor="let category of categories$ | async | keyvalue"
+            [value]="category.key"
+            >{{ category.key }}</ng-option
+          >
+        </ng-select>
+      </div>
+      <div>
+        <label class="mb-4" for="type">Quiz Type:</label>
+        <ng-select formControlName="type">
+          <ng-option value="" disabled selected>Select Type</ng-option>
+          <ng-option value="image_choice">Image choice</ng-option>
+          <ng-option value="text_choice">Text choice</ng-option>
+        </ng-select>
+      </div>
+      <div>
+        <label class="mb-4" for="totalQuestions">Total Questions:</label>
+        <input
+          type="range"
+          id="numberOfQuestions"
+          formControlName="totalQuestions"
+          min="1"
+          max="20"
+          value="5"
+        />
+        <span>{{ quizForm.get('totalQuestions')?.value }}</span>
+      </div>
+
+      <div class="quizSubmit">
+        <button type="submit" [disabled]="quizForm.invalid">Start Quiz</button>
+      </div>
+    </form>
+  </div>
+</div>

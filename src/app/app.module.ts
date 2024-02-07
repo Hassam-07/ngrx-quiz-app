@@ -18,6 +18,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { QuizResultComponent } from './quiz-result/quiz-result.component';
 import { TimeFormatPipe } from './time-format.pipe';
+import { UserLoginComponent } from './user-login/user-login.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { QuizComponent } from './quiz/quiz.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +30,8 @@ import { TimeFormatPipe } from './time-format.pipe';
     QuizFooterComponent,
     QuizResultComponent,
     TimeFormatPipe,
+    UserLoginComponent,
+    QuizComponent,
   ],
   imports: [
     BrowserModule,
@@ -41,6 +46,7 @@ import { TimeFormatPipe } from './time-format.pipe';
     }),
     StoreModule.forFeature(trivia.QUIZ_FEATURE_KEY, trivia.quizReducer),
     EffectsModule.forFeature([QuizEffects]),
+    NgSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -1,8 +1,10 @@
-<div class="restartBtnFooter">
-  <h1>Quiz Completed</h1>
-  <h3>
-    Your final score is {{ score }} out of
-    {{ questions.length }}
-  </h3>
-  <button class="restartQuiz" (click)="restartQuiz()">Restart Quiz</button>
-</div>
+<ng-container *ngIf="quizViewState$ | async as trivia">
+  <div class="restartBtnFooter">
+    <h1>Quiz Completed</h1>
+    <h3>
+      Your final score is {{ trivia.score }} out of
+      {{ trivia.questions.length }}
+    </h3>
+    <button class="restartQuiz" (click)="restartQuiz()">Restart Quiz</button>
+  </div>
+</ng-container>

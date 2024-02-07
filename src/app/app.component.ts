@@ -13,7 +13,7 @@ import {
   QuizPageActions,
 } from './+state/quiz-app/quizApp.actions';
 
-import { Observable, Subscription, map, take } from 'rxjs';
+import { Observable, Subscription, interval, map, take } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { TriviaState } from './+state/quiz-app/quiz.reducer';
 import {
@@ -40,130 +40,99 @@ import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
-  constructor(
-    private store: Store<TriviaState>,
-    private router: Router,
-    private triviaQuizService: QuizAppService
-  ) {}
-  quizForm!: FormGroup;
-  quizStarted = false;
-  currentQuestionNumber$!: Observable<number | null>;
-  isFirstQuestion$!: Observable<boolean>;
-  totalQuestions$!: Observable<number>;
-  score = 0;
-  isOptionSelected = false;
-  // currentQuestion = 'Who is the founder of Pakistan';
-  // options: string[] = [
-  //   'Allama Iqbal',
-  //   'Quaid e Azam',
-  //   'Imran Khan',
-  //   'Sir Syed',
-  // ];
-  // lastQuestion$!: Observable<boolean>;
-  previousAllowed = true;
-  answered = false;
-  selectedOption: string | undefined;
-  quizQuestions = true;
-  response!: string;
-  quizViewState$!: Observable<any>;
-  categories$!: Observable<Categories>;
-  timer: Subscription | undefined;
-  remainingTime = 0;
-  timerInterval: any;
-  options$!: Observable<string[]>;
-
-  ngOnInit(): void {
-    this.options$ = this.store.pipe(
-      select(selectCurrentQuestion),
-      map((question) => question.options)
-    );
-    this.categories$ = this.store.select(selectCategories);
-    this.quizViewState$ = this.store.select(selectQuizView);
-    this.currentQuestionNumber$ = this.store.select(
-      selectCurrentQuestionNumber
-    );
-    this.quizForm = new FormGroup({
-      username: new FormControl(''),
-      categories: new FormControl([]),
-      difficulties: new FormControl(''),
-      totalQuestions: new FormControl(5),
-      type: new FormControl(''),
-    });
-    this.store.dispatch(QuizPageActions.loadCategories());
-    this.isFirstQuestion$ = this.currentQuestionNumber$.pipe(
-      map((index) => index === 1)
-    );
-  }
-  toggleOptionWindow() {
-    this.store.dispatch(QuizPageActions.toggleOptionWindow());
-  }
-  setCurrentQuestion(currentQuestionNumber: number) {
-    this.store.dispatch(
-      QuizPageActions.setCurrentQuestion({ currentQuestionNumber })
-    );
-  }
-  openSideWindow() {
-    this.store.dispatch(QuizPageActions.openSideWindow());
-  }
-  closeSideWindow() {
-    this.store.dispatch(QuizPageActions.closeSideWindow());
-  }
-  startQuiz() {
-    this.quizStarted = true;
-
-    this.store.dispatch(
-      QuizPageActions.submitForm({ formValue: this.quizForm.value })
-    );
-
-    this.triviaSubscribe();
-    this.router.navigate(['/quizstart']);
-  }
-
-  triviaSubscribe() {
-    this.store.dispatch(QuizPageActions.loadTrivia());
-    const totalTimeInSeconds = this.quizForm.value.totalQuestions * 10; // Calculate total time in seconds
-    this.remainingTime = totalTimeInSeconds; // Set the remaining time initially
-    console.log(this.quizForm.value);
-    // Start the timer
-    this.timerInterval = setInterval(() => {
-      this.remainingTime--;
-      if (this.remainingTime <= 0) {
-        clearInterval(this.timerInterval); // Stop the timer
-        // this.showFinalScore = true;
-        this.quizQuestions = false;
-        // this.restartQuiz();
-        // this.finalScoreMessage = 'Time is up! Quiz ended.';
-        console.log(this.quizQuestions);
-        return;
-      }
-    }, 1000);
-    // console.log(this.quizQuestions);
-    this.quizForm.reset();
-  }
-
-  nextQuestion(): void {
-    this.store.dispatch(QuizPageActions.nextQuestion());
-  }
-
-  skipQuestion() {
-    this.store.dispatch(QuizPageActions.skipQuestion());
-  }
-
-  handleOption(guess: string) {
-    this.store.dispatch(QuizPageActions.answerQuestion({ guess }));
-  }
-
-  // Restart quiz method
-  restartQuiz() {
-    this.quizStarted = false;
-    this.quizForm.reset();
-    this.store.dispatch(QuizPageActions.restartQuiz());
-    this.router.navigate(['/']);
-  }
-  previousQuestion() {
-    this.store.dispatch(QuizPageActions.previousQuestion());
-  }
+export class AppComponent {
+  // constructor(
+  //   private store: Store<TriviaState>,
+  //   private router: Router,
+  //   private triviaQuizService: QuizAppService
+  // ) {}
+  // currentQuestionNumber$!: Observable<number | null>;
+  // isFirstQuestion$!: Observable<boolean>;
+  // totalQuestions$!: Observable<number>;
+  // score = 0;
+  // isOptionSelected = false;
+  // previousAllowed = true;
+  // answered = false;
+  // selectedOption: string | undefined;
+  // quizQuestions = false;
+  // response!: string;
+  // quizViewState$!: Observable<any>;
+  // categories$!: Observable<Categories>;
+  // timer: Subscription | undefined;
+  // remainingTime = 0;
+  // timerInterval: any;
+  // options$!: Observable<string[]>;
+  // uiTimer: any;
+  // startTime: any;
+  // totalQuestions = 0;
+  // timerSubscription!: Subscription;
+  // timerDuration = 0;
+  // ngOnInit(): void {
+  //   this.categories$ = this.store.select(selectCategories);
+  //   this.quizViewState$ = this.store.select(selectQuizView);
+  //   this.isFirstQuestion$ = this.quizViewState$.pipe(
+  //     map((quizViewState) => quizViewState.currentQuestionNumber === 1)
+  //   );
+  //   this.quizViewState$.subscribe((quizViewState) => {
+  //     if (quizViewState) {
+  //       this.totalQuestions = quizViewState.totalQuestions;
+  //       this.timerDuration = this.calculateTimerDuration();
+  //       this.startTimer();
+  //     }
+  //   });
+  // }
+  // calculateTimerDuration(): number {
+  //   return this.totalQuestions * 10;
+  // }
+  // startTimer(): void {
+  //   let timer = this.timerDuration;
+  //   this.timerSubscription = interval(1000).subscribe(() => {
+  //     if (timer >= 0) {
+  //       const minutes = Math.floor(timer / 60);
+  //       const seconds = timer % 60;
+  //       const formattedMinutes = minutes < 10 ? '0' + minutes : '' + minutes;
+  //       const formattedSeconds = seconds < 10 ? '0' + seconds : '' + seconds;
+  //       this.uiTimer = `${formattedMinutes}:${formattedSeconds}`;
+  //       timer--;
+  //     }
+  //   });
+  // }
+  // toggleOptionWindow() {
+  //   this.store.dispatch(QuizPageActions.toggleOptionWindow());
+  // }
+  // setCurrentQuestion(currentQuestionNumber: number) {
+  //   this.store.dispatch(
+  //     QuizPageActions.setCurrentQuestion({ currentQuestionNumber })
+  //   );
+  // }
+  // openSideWindow() {
+  //   this.store.dispatch(QuizPageActions.openSideWindow());
+  // }
+  // closeSideWindow() {
+  //   this.store.dispatch(QuizPageActions.closeSideWindow());
+  // }
+  // triviaSubscribe() {
+  //   this.store.dispatch(QuizPageActions.loadTrivia());
+  // }
+  // nextQuestion(): void {
+  //   this.store.dispatch(QuizPageActions.nextQuestion());
+  //   this.quizViewState$.subscribe((quizViewState) => {
+  //     const { currentQuestionNumber, totalQuestions } = quizViewState;
+  //     if (currentQuestionNumber > totalQuestions) {
+  //       this.quizQuestions = false;
+  //       this.router.navigate(['/results']);
+  //     }
+  //   });
+  // }
+  // skipQuestion() {
+  //   this.store.dispatch(QuizPageActions.skipQuestion());
+  // }
+  // handleOption(guess: string) {
+  //   this.store.dispatch(QuizPageActions.answerQuestion({ guess }));
+  // }
+  // previousQuestion() {
+  //   this.store.dispatch(QuizPageActions.previousQuestion());
+  // }
 }
 
 // triviaSubscribe() {

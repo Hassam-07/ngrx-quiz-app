@@ -8,6 +8,7 @@ export const QuizPageActions = createActionGroup({
     Enter: emptyProps(),
     'Load Trivia': emptyProps(),
     'Next Question': emptyProps(),
+    'Finish Quiz': emptyProps(),
     'Answer Question': props<{ guess: string }>(),
     'Skip Question': emptyProps(),
     'Restart Quiz': emptyProps(),

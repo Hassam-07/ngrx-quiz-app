@@ -74,7 +74,7 @@ export const quizReducer = createReducer(
       console.log('Setting lastQuestion to true in reducer');
       return {
         ...state,
-        quizQuestions: false,
+        // quizQuestions: false,
         response: currentResponse,
         // correctAnswer: '',
       };
@@ -183,5 +183,9 @@ export const quizReducer = createReducer(
     ...state,
     optionWindowVisible: !state.optionWindowVisible,
     sideWindowVisible: false,
+  })),
+  on(QuizPageActions.finishQuiz, (state) => ({
+    ...state,
+    quizFinished: true,
   }))
 );
