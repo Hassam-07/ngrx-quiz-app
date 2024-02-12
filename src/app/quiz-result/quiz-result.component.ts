@@ -2,11 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Question } from 'lib/src/lib/quiz-interface/quizApp.models';
-import { Observable } from 'rxjs';
-import {
-  selectQuizView,
-  selectTotalQuestions,
-} from '../+state/quiz-app/quiz.selectors';
+import { Observable, map } from 'rxjs';
+import { selectQuizView } from '../+state/quiz-app/quiz.selectors';
 import { QuizPageActions } from '../+state/quiz-app/quizApp.actions';
 
 @Component({
@@ -15,18 +12,35 @@ import { QuizPageActions } from '../+state/quiz-app/quizApp.actions';
   styleUrls: ['./quiz-result.component.scss'],
 })
 export class QuizResultComponent implements OnInit {
-  // currentScore$!: Observable<number>;
-  // totalQuestions$!: Observable<number>;
   quizViewState$!: Observable<any>;
-
+  // username$!: Observable<string>;
+  // percentage$!: Observable<number>;
+  message$!: Observable<string>;
   constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
     this.quizViewState$ = this.store.select(selectQuizView);
-    // this.totalQuestions$ = this.store.pipe(select(selectTotalQuestions));
+    // this.username$ = this.store.select(selectUsername);
+    // this.percentage$ = this.store
+    //   .select(selectQuizView)
+    //   .pipe(map((trivia) => (trivia.score / trivia.questions.length) * 100));
+    this.message$ = this.quizViewState$.pipe(
+      map((quizViewState) => {
+        if (quizViewState.percentage === 100) {
+          return 'Excellent Job!😊👌';
+        } else if (quizViewState.percentage >= 80) {
+          return 'Good, keep it up!👌';
+        } else if (quizViewState.percentage >= 50) {
+          return 'Keep it up👌';
+        } else if (quizViewState.percentage >= 30) {
+          return 'Ohhh!, Prepare for the next time👍';
+        } else {
+          return 'You have failed the quiz!😒. better luck next time!👍';
+        }
+      })
+    );
   }
   restartQuiz() {
     this.store.dispatch(QuizPageActions.restartQuiz());
-    this.router.navigate(['/']);
   }
 }

@@ -1,15 +1,30 @@
 import { Injectable, inject } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { switchMap, catchError, of, EMPTY, map, mergeMap, tap } from 'rxjs';
+import {
+  switchMap,
+  catchError,
+  of,
+  EMPTY,
+  map,
+  mergeMap,
+  tap,
+  interval,
+  takeUntil,
+} from 'rxjs';
 
 // import * as QuizFeature from './quiz.reducer';
 import { QuizAppService } from 'lib/src/lib/quiz-api-service/quiz-app.service';
 import { QuizApiActions, QuizPageActions } from './quizApp.actions';
+import { Router } from '@angular/router';
 // import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
 
 @Injectable()
 export class QuizEffects {
-  constructor(private actions$: Actions, private quizService: QuizAppService) {}
+  constructor(
+    private actions$: Actions,
+    private quizService: QuizAppService,
+    private router: Router
+  ) {}
 
   loadTrivia$ = createEffect(() =>
     this.actions$.pipe(
@@ -43,5 +58,61 @@ export class QuizEffects {
         )
       )
     )
+  );
+
+  navigateToResults$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(QuizPageActions.finishQuiz),
+        tap(() => {
+          this.router.navigate(['/results']);
+        })
+      ),
+    { dispatch: false }
+  );
+  navigateToQuiz$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(QuizApiActions.triviaLoadedSuccess),
+        tap(() => {
+          this.router.navigate(['/quizstart']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  restartQuiz$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(QuizPageActions.restartQuiz),
+        tap(() => {
+          this.router.navigate(['/']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  startTimer$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(QuizPageActions.startTimer),
+      tap((time) => {
+        console.log('effects Timer', time);
+      }),
+      mergeMap(() =>
+        interval(1000).pipe(
+          map(() => QuizPageActions.timerTick()),
+          takeUntil(this.actions$.pipe(ofType(QuizPageActions.stopTimer)))
+        )
+      )
+    )
+  );
+
+  stopTimer$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(QuizPageActions.stopTimer),
+        map(() => this.router.navigate(['/results']))
+      ),
+    { dispatch: false }
   );
 }

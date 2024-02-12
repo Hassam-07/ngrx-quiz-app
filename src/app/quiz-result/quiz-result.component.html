@@ -1,10 +1,37 @@
 <ng-container *ngIf="quizViewState$ | async as trivia">
   <div class="restartBtnFooter">
     <h1>Quiz Completed</h1>
-    <h3>
+    <!-- <h3>
       Your final score is {{ trivia.score }} out of
       {{ trivia.questions.length }}
-    </h3>
+    </h3> -->
+    <div class="user-info">
+      <h1>Welcome, {{ trivia.username }}!</h1>
+      <h2>
+        Your final score: {{ trivia.score }} / {{ trivia.questions.length }}
+      </h2>
+      <h3>Percentage: {{ trivia.percentage }}%</h3>
+      <h3>{{ message$ | async }}</h3>
+    </div>
     <button class="restartQuiz" (click)="restartQuiz()">Restart Quiz</button>
   </div>
 </ng-container>
+
+<!-- <mat-tab-group>
+  <mat-tab label="Result">
+    <div class="restartBtnFooter">
+      <h1>Quiz Completed</h1>
+      <h3>
+        Your final score is {{ trivia.score }} out of
+        {{ trivia.questions.length }}
+      </h3>
+      <button class="restartQuiz" (click)="restartQuiz()">
+        Restart Quiz
+      </button>
+    </div>
+  </mat-tab>
+  <mat-tab label="Overview">
+    <h1>Some more tab content</h1>
+    <p>...</p>
+  </mat-tab>
+</mat-tab-group> -->

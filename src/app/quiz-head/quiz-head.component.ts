@@ -11,7 +11,7 @@ export class QuizHeadComponent {
   @Input() score!: number;
   @Input() remainingTime = 0;
   @Input() timerInterval: any;
-  @Input() uiTimer: any;
+  @Input() uiTimer!: string;
   @Input() isFirstQuestion!: boolean | null;
   @Output() nextButton = new EventEmitter();
   @Output() optionWindow = new EventEmitter();

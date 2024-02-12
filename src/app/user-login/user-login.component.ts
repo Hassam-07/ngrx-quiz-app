@@ -18,7 +18,6 @@ import { QuizPageActions } from '../+state/quiz-app/quizApp.actions';
   styleUrls: ['./user-login.component.scss'],
 })
 export class UserLoginComponent implements OnInit {
-  // quizLoginForm!: FormGroup;
   quizForm!: FormGroup;
   categories$!: Observable<Categories>;
   totalQuestions$!: Observable<number>;
@@ -30,16 +29,7 @@ export class UserLoginComponent implements OnInit {
 
   ngOnInit() {
     this.store.dispatch(QuizPageActions.loadCategories());
-
-    // this.totalQuestions$ = this.store.select(selectTotalQuestions);
     this.categories$ = this.store.select(selectCategories);
-    // this.store.dispatch(QuizActions.loadCategories());
-    // this.quizLoginForm = this.fb.group({
-    //   username: ['', [Validators.required]],
-    //   numberOfQuestions: [0, [Validators.required, Validators.min(1)]],
-    //   difficulty: ['', [Validators.required]],
-    //   category: [[], [Validators.required]],
-    // });
     this.quizForm = new FormGroup({
       username: new FormControl(''),
       categories: new FormControl([]),
@@ -50,13 +40,9 @@ export class UserLoginComponent implements OnInit {
   }
 
   startQuiz() {
-    // this.quizStarted = true;
-
     this.store.dispatch(
       QuizPageActions.submitForm({ formValue: this.quizForm.value })
     );
     this.quizForm.reset();
-    // this.triviaSubscribe();
-    this.router.navigate(['/quizstart']);
   }
 }

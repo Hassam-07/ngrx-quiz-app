@@ -6,6 +6,7 @@ import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
 export const QUIZ_FEATURE_KEY = 'quiz';
 
 export interface TriviaState {
+  username: string;
   questions: Question[];
   currentQuestionNumber: number;
   score: number;
@@ -18,9 +19,11 @@ export interface TriviaState {
   categories: Categories;
   sideWindowVisible: boolean;
   optionWindowVisible: boolean;
+  timerDuration: number;
 }
 
 export const initialState: TriviaState = {
+  username: '',
   questions: [],
   currentQuestionNumber: 1,
   score: 0,
@@ -33,6 +36,8 @@ export const initialState: TriviaState = {
   categories: {},
   sideWindowVisible: false,
   optionWindowVisible: false,
+  // uiTimer: '00:00',
+  timerDuration: 0,
 };
 
 export const quizReducer = createReducer(
@@ -45,7 +50,7 @@ export const quizReducer = createReducer(
     options: trivia[state.currentQuestionNumber - 1].incorrectAnswers
       .concat(trivia[state.currentQuestionNumber - 1].correctAnswer)
       .sort(),
-    // lastQuestion: trivia.length === state.totalQuestions,
+    timerDuration: trivia.length * 10,
   })),
   on(QuizPageActions.nextQuestion, (state) => {
     const currentQuestionIndex = state.currentQuestionNumber;
@@ -53,11 +58,6 @@ export const quizReducer = createReducer(
     const currentResponse = state.userResponses[currentQuestionIndex] || '';
     console.log(nextQuestion);
     if (state.currentQuestionNumber < state.questions.length) {
-      // let nextBtn = state.nextBtn;
-      // if (state.currentQuestionNumber === state.questions.length) {
-      //   nextBtn = 'Finish';
-      // }
-      // Save the response before moving to the next question
       const updatedUserResponses = [...state.userResponses];
       updatedUserResponses[currentQuestionIndex] = currentResponse;
 
@@ -67,29 +67,20 @@ export const quizReducer = createReducer(
         selectedOption: undefined,
         response: currentResponse,
         userResponses: updatedUserResponses,
-        // correctAnswer: nextQuestion?.correctAnswer || '',
-        // nextBtn,
       };
     } else {
       console.log('Setting lastQuestion to true in reducer');
       return {
         ...state,
-        // quizQuestions: false,
         response: currentResponse,
-        // correctAnswer: '',
       };
     }
   }),
   on(QuizPageActions.skipQuestion, (state) => {
     if (state.currentQuestionNumber < state.questions.length) {
-      // const nextQuestion = state.questions[state.currentQuestionNumber];
       return {
         ...state,
         currentQuestionNumber: state.currentQuestionNumber + 1,
-        // currentQuestion: nextQuestion.question.text,
-        // options: nextQuestion.incorrectAnswers
-        //   .concat(nextQuestion.correctAnswer)
-        //   .sort(),
         selectedOption: undefined,
       };
     } else {
@@ -106,10 +97,6 @@ export const quizReducer = createReducer(
       return {
         ...state,
         currentQuestionNumber: state.currentQuestionNumber - 1,
-        // currentQuestion: previousQuestion.question.text,
-        // options: previousQuestion.incorrectAnswers
-        //   .concat(previousQuestion.correctAnswer)
-        //   .sort(),
         selectedOption: response || undefined,
         response,
         correctAnswer,
@@ -128,8 +115,6 @@ export const quizReducer = createReducer(
       const score = guess === correctAnswer ? state.score + 1 : state.score;
       return {
         ...state,
-        // answered: true,
-        // selectedButton: true,
         score,
         response: guess,
         correctAnswer,
@@ -138,7 +123,6 @@ export const quizReducer = createReducer(
     } else {
       return {
         ...state,
-        // selectedButton: false
         response: '',
         userResponses: updatedResponses,
       };
@@ -184,8 +168,15 @@ export const quizReducer = createReducer(
     optionWindowVisible: !state.optionWindowVisible,
     sideWindowVisible: false,
   })),
-  on(QuizPageActions.finishQuiz, (state) => ({
+  on(QuizPageActions.startTimer, (state) => ({
     ...state,
-    quizFinished: true,
+  })),
+  on(QuizPageActions.stopTimer, (state) => ({
+    ...state,
+    timerDuration: 0,
+  })),
+  on(QuizPageActions.timerTick, (state) => ({
+    ...state,
+    timerDuration: state.timerDuration - 1,
   }))
 );

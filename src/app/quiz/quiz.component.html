@@ -1,6 +1,6 @@
 <div class="flex">
-    <div class="wrapper">
-      <!-- <ng-container class="startQuizPage" *ngIf="!quizStarted; else quizContent">
+  <div class="wrapper">
+    <!-- <ng-container class="startQuizPage" *ngIf="!quizStarted; else quizContent">
         <form [formGroup]="quizForm" (ngSubmit)="startQuiz()">
           <div>
             <label>
@@ -76,61 +76,60 @@
           <button type="submit" [disabled]="quizForm.invalid">Start Quiz</button>
         </form>
       </ng-container> -->
-      <!-- <ng-template #quizContent> -->
-      <ng-container *ngIf="quizViewState$ | async as trivia">
-        <!-- {{ trivia | json }} -->
-        <!-- <ng-container *ngIf="trivia.quizQuestions"> -->
-          <quiz-app-quiz-head
-            [currentQuestionNumber]="trivia.questionNumber"
-            [totalQuestions]="trivia.questions.length"
-            [score]="trivia.score"
-            [isFirstQuestion]="isFirstQuestion$ | async"
-            [optionWindowVisible]="trivia.answerPanel"
-            (nextButton)="nextQuestion()"
-            (optionWindow)="toggleOptionWindow()"
-            (previousButton)="previousQuestion()"
-            (skipButton)="skipQuestion()"
-            [remainingTime]="remainingTime"
-            [uiTimer]="uiTimer"
-            [timerInterval]="timerInterval"
-          ></quiz-app-quiz-head>
-          <quiz-app-quiz-body
-            (openSideNav)="openSideWindow()"
-            (closeSideNav)="closeSideWindow()"
-            [correctAnswer]="trivia.correctAnswer"
-            [userResponses]="trivia.userResponses"
-            [sideWindowVisible]="trivia.questionPanel"
-            [questions]="trivia.questions"
-            (questionClicked)="setCurrentQuestion($event)"
-            [currentQuestion]="trivia.currentQuestion.question?.text"
-            [options]="trivia.currentQuestion.options"
-          ></quiz-app-quiz-body>
-          <ng-container *ngIf="trivia.answerPanel" class="option-window">
-            <!-- [lastQuestion]="trivia.lastQuestion" -->
-            <quiz-app-quiz-footer
-              (optionClick)="handleOption($event)"
-              [questions]="trivia.questions"
-              [currentQuestionNumber]="trivia.questionNumber"
-              [correctAnswer]="trivia.correctAnswer"
-              [totalQuestions]="trivia.totalQuestions"
-              [response]="trivia.response"
-              [isOptionSelected]="isOptionSelected"
-              [options]="trivia.currentQuestion.options"
-              [isFirstQuestion]="isFirstQuestion$ | async"
-              (nextButton)="nextQuestion()"
-              (previousButton)="previousQuestion()"
-              (skipButton)="skipQuestion()"
-            ></quiz-app-quiz-footer>
-          </ng-container>
-        </ng-container>
-        <!-- <ng-template #result>
+    <!-- <ng-template #quizContent> -->
+    <ng-container *ngIf="quizViewState$ | async as trivia">
+      <!-- {{ trivia | json }} -->
+      <!-- <ng-container *ngIf="trivia.quizQuestions"> -->
+      <quiz-app-quiz-head
+        [currentQuestionNumber]="trivia.questionNumber"
+        [totalQuestions]="trivia.questions.length"
+        [score]="trivia.score"
+        [isFirstQuestion]="isFirstQuestion$ | async"
+        [optionWindowVisible]="trivia.answerPanel"
+        (nextButton)="nextQuestion()"
+        (optionWindow)="toggleOptionWindow()"
+        (previousButton)="previousQuestion()"
+        (skipButton)="skipQuestion()"
+        [uiTimer]="trivia.uiTimer"
+      ></quiz-app-quiz-head>
+      <quiz-app-quiz-body
+        (openSideNav)="openSideWindow()"
+        (closeSideNav)="closeSideWindow()"
+        [correctAnswer]="trivia.correctAnswer"
+        [userResponses]="trivia.userResponses"
+        [sideWindowVisible]="trivia.questionPanel"
+        [questions]="trivia.questions"
+        (questionClicked)="setCurrentQuestion($event)"
+        [currentQuestion]="trivia.currentQuestion.question?.text"
+        [options]="trivia.currentQuestion.options"
+      ></quiz-app-quiz-body>
+      <ng-container *ngIf="trivia.answerPanel" class="option-window">
+        <!-- [lastQuestion]="trivia.lastQuestion" -->
+        <quiz-app-quiz-footer
+          (optionClick)="handleOption($event)"
+          [questions]="trivia.questions"
+          [currentQuestionNumber]="trivia.questionNumber"
+          [correctAnswer]="trivia.correctAnswer"
+          [totalQuestions]="trivia.totalQuestions"
+          [response]="trivia.response"
+          [isOptionSelected]="isOptionSelected"
+          [options]="trivia.currentQuestion.options"
+          [isFirstQuestion]="isFirstQuestion$ | async"
+          (nextButton)="nextQuestion()"
+          (finishButton)="finishQuiz()"
+          (previousButton)="previousQuestion()"
+          (skipButton)="skipQuestion()"
+        ></quiz-app-quiz-footer>
+      </ng-container>
+    </ng-container>
+    <!-- <ng-template #result>
             <quiz-app-quiz-result
               (restartTrivia)="restartQuiz()"
               [questions]="trivia.questions"
               [score]="trivia.score"
             ></quiz-app-quiz-result>
           </ng-template> -->
-      <!-- </ng-container> -->
-      <!-- </ng-template> -->
-    </div>
+    <!-- </ng-container> -->
+    <!-- </ng-template> -->
   </div>
+</div>

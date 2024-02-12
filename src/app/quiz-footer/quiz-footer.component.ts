@@ -18,6 +18,7 @@ export class QuizFooterComponent {
   @Input() correctAnswer!: string;
   @Output() skipButton = new EventEmitter();
   @Output() nextButton = new EventEmitter();
+  @Output() finishButton = new EventEmitter();
   @Output() previousButton = new EventEmitter();
   @Input() isFirstQuestion!: boolean | null;
   @Input() isOptionSelected!: boolean;
@@ -31,6 +32,10 @@ export class QuizFooterComponent {
   nextQuestion() {
     // console.log('Last Question:', this.lastQuestion);
     this.nextButton.emit();
+  }
+  finishQuiz() {
+    // console.log('Last Question:', this.lastQuestion);
+    this.finishButton.emit();
   }
   skipQuestion() {
     this.skipButton.emit();

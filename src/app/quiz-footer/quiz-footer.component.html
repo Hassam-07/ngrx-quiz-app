@@ -50,7 +50,7 @@
         {{ nextBtn }}
       </button> -->
       <ng-container>
-        <button (click)="nextQuestion()" class="next-btn">
+        <button (click)="currentQuestionNumber < questions.length ? nextQuestion(): finishQuiz()" class="next-btn">
           <span
             *ngIf="currentQuestionNumber < questions.length; else finishButton"
             >Next</span

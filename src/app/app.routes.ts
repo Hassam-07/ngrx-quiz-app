@@ -8,6 +8,7 @@ export const appRoutes: Route[] = [
   {
     path: '',
     component: UserLoginComponent,
+    pathMatch: 'full',
   },
   {
     path: 'quizstart',
@@ -16,5 +17,9 @@ export const appRoutes: Route[] = [
   {
     path: 'results',
     component: QuizResultComponent,
+  },
+  {
+    path: '**',
+    redirectTo: '',
   },
 ];
