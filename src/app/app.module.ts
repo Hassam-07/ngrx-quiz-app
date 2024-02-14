@@ -21,6 +21,8 @@ import { TimeFormatPipe } from './time-format.pipe';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { QuizComponent } from './quiz/quiz.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -36,6 +38,7 @@ import { QuizComponent } from './quiz/quiz.component';
   imports: [
     BrowserModule,
     CommonModule,
+    BrowserAnimationsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes, { initialNavigation: 'enabledBlocking' }),
     HttpClientModule,
@@ -47,6 +50,7 @@ import { QuizComponent } from './quiz/quiz.component';
     StoreModule.forFeature(trivia.QUIZ_FEATURE_KEY, trivia.quizReducer),
     EffectsModule.forFeature([QuizEffects]),
     NgSelectModule,
+    MatTabsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

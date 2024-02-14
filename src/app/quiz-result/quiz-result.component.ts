@@ -13,17 +13,12 @@ import { QuizPageActions } from '../+state/quiz-app/quizApp.actions';
 })
 export class QuizResultComponent implements OnInit {
   quizViewState$!: Observable<any>;
-  // username$!: Observable<string>;
-  // percentage$!: Observable<number>;
+  questions: Question[] = [];
   message$!: Observable<string>;
   constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
     this.quizViewState$ = this.store.select(selectQuizView);
-    // this.username$ = this.store.select(selectUsername);
-    // this.percentage$ = this.store
-    //   .select(selectQuizView)
-    //   .pipe(map((trivia) => (trivia.score / trivia.questions.length) * 100));
     this.message$ = this.quizViewState$.pipe(
       map((quizViewState) => {
         if (quizViewState.percentage === 100) {

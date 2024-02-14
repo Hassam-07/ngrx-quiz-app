@@ -10,12 +10,16 @@ import {
   tap,
   interval,
   takeUntil,
+  filter,
+  withLatestFrom,
 } from 'rxjs';
 
 // import * as QuizFeature from './quiz.reducer';
 import { QuizAppService } from 'lib/src/lib/quiz-api-service/quiz-app.service';
 import { QuizApiActions, QuizPageActions } from './quizApp.actions';
 import { Router } from '@angular/router';
+import { selectCategories, selectTimerDuration } from './quiz.selectors';
+import { Store, select } from '@ngrx/store';
 // import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
 
 @Injectable()
@@ -23,7 +27,8 @@ export class QuizEffects {
   constructor(
     private actions$: Actions,
     private quizService: QuizAppService,
-    private router: Router
+    private router: Router,
+    private store: Store
   ) {}
 
   loadTrivia$ = createEffect(() =>
@@ -47,6 +52,8 @@ export class QuizEffects {
   loadCategories$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuizPageActions.loadCategories),
+      withLatestFrom(this.store.pipe(select(selectCategories))),
+      filter(([_, categories]) => Object.keys(categories).length === 0),
       mergeMap(() =>
         this.quizService.getCategories().pipe(
           map((categories) =>
@@ -107,11 +114,30 @@ export class QuizEffects {
     )
   );
 
+  // stopTimer$ = createEffect(
+  //   () =>
+  //     this.actions$.pipe(
+  //       ofType(QuizPageActions.stopTimer),
+  //       map(() => this.router.navigate(['/results']))
+  //     ),
+  //   { dispatch: false }
+  // );
+
   stopTimer$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(QuizPageActions.stopTimer),
-        map(() => this.router.navigate(['/results']))
+        ofType(QuizPageActions.timerTick),
+        switchMap(() =>
+          this.store.pipe(
+            select(selectTimerDuration),
+            tap((timerDuration) => {
+              if (timerDuration === 0) {
+                this.store.dispatch(QuizPageActions.stopTimer());
+                this.store.dispatch(QuizPageActions.finishQuiz());
+              }
+            })
+          )
+        )
       ),
     { dispatch: false }
   );

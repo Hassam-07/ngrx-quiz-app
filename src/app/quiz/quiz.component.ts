@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { QuizAppService } from 'lib/src/lib/quiz-api-service/quiz-app.service';
 import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
-import { Observable, map } from 'rxjs';
+import { Observable, filter, map } from 'rxjs';
 import { TriviaState } from '../+state/quiz-app/quiz.reducer';
 import {
   selectCategories,
@@ -31,6 +31,7 @@ export class QuizComponent implements OnInit {
   categories$!: Observable<Categories>;
   options$!: Observable<string[]>;
   timerDuration$!: Observable<number>;
+  categoriesLoaded$!: Observable<boolean>;
 
   ngOnInit(): void {
     this.categories$ = this.store.select(selectCategories);
@@ -40,12 +41,12 @@ export class QuizComponent implements OnInit {
       map((quizViewState) => quizViewState.currentQuestionNumber === 1)
     );
     this.store.dispatch(QuizPageActions.startTimer());
-    this.timerDuration$.subscribe((timerDuration) => {
-      if (timerDuration === 0) {
-        console.log(timerDuration);
-        this.store.dispatch(QuizPageActions.stopTimer());
-      }
-    });
+    // this.timerDuration$.subscribe((timerDuration) => {
+    //   if (timerDuration === 0) {
+    //     console.log(timerDuration);
+    //     this.store.dispatch(QuizPageActions.stopTimer());
+    //   }
+    // });
   }
 
   toggleOptionWindow() {
@@ -73,7 +74,6 @@ export class QuizComponent implements OnInit {
   finishQuiz() {
     this.store.dispatch(QuizPageActions.finishQuiz());
     this.store.dispatch(QuizPageActions.stopTimer());
-    // this.router.navigate(['/results']);
   }
   skipQuestion() {
     this.store.dispatch(QuizPageActions.skipQuestion());

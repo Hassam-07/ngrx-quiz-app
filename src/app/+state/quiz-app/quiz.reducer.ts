@@ -130,12 +130,23 @@ export const quizReducer = createReducer(
   }),
   on(QuizPageActions.restartQuiz, (state) => ({
     ...state,
-    ...initialState,
+    username: '',
+    questions: [],
+    currentQuestionNumber: 1,
+    score: 0,
     quizQuestions: true,
+    selectedOption: undefined,
+    previousAllowed: false,
+    userResponses: [],
+    timerDuration: 0,
   })),
   on(QuizApiActions.loadCategoriesSuccess, (state, { categories }) => ({
     ...state,
     categories,
+  })),
+  on(QuizPageActions.submitForm, (state, { formValue }) => ({
+    ...state,
+    username: formValue.username,
   })),
   on(QuizPageActions.setCurrentQuestion, (state, { currentQuestionNumber }) => {
     if (

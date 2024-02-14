@@ -1,37 +1,68 @@
 <ng-container *ngIf="quizViewState$ | async as trivia">
-  <div class="restartBtnFooter">
-    <h1>Quiz Completed</h1>
-    <!-- <h3>
-      Your final score is {{ trivia.score }} out of
-      {{ trivia.questions.length }}
-    </h3> -->
-    <div class="user-info">
-      <h1>Welcome, {{ trivia.username }}!</h1>
-      <h2>
-        Your final score: {{ trivia.score }} / {{ trivia.questions.length }}
-      </h2>
-      <h3>Percentage: {{ trivia.percentage }}%</h3>
-      <h3>{{ message$ | async }}</h3>
-    </div>
-    <button class="restartQuiz" (click)="restartQuiz()">Restart Quiz</button>
-  </div>
-</ng-container>
+  <mat-tab-group>
+    <mat-tab label="Result">
+      <div class="restartBtnFooter">
+        <h1>Quiz Completed</h1>
+        <div class="user-info">
+          <h1>Welcome, {{ trivia.username }}!</h1>
+          <h2>
+            Your final score: {{ trivia.score }} / {{ trivia.questions.length }}
+          </h2>
+          <h3>Percentage: {{ trivia.percentage }}%</h3>
+          <h3>{{ message$ | async }}</h3>
+        </div>
+        <button class="restartQuiz" (click)="restartQuiz()">
+          Restart Quiz
+        </button>
+      </div>
+    </mat-tab>
+    <mat-tab label="Overview">
+      <ng-container *ngIf="quizViewState$ | async as trivia">
+        <div
+          *ngFor="let question of trivia.questions; let i = index"
+          class="window-flex"
+        >
+          <h3>{{ i + 1 }}: {{ question.question.text }}</h3>
 
-<!-- <mat-tab-group>
-  <mat-tab label="Result">
-    <div class="restartBtnFooter">
-      <h1>Quiz Completed</h1>
-      <h3>
-        Your final score is {{ trivia.score }} out of
-        {{ trivia.questions.length }}
-      </h3>
-      <button class="restartQuiz" (click)="restartQuiz()">
-        Restart Quiz
-      </button>
-    </div>
-  </mat-tab>
-  <mat-tab label="Overview">
-    <h1>Some more tab content</h1>
-    <p>...</p>
-  </mat-tab>
-</mat-tab-group> -->
+          <div class="attempted-question">
+            <h3 *ngIf="trivia.userResponses[i]">
+              <span>Attempted Question: </span> Yes
+            </h3>
+            <h3 *ngIf="!trivia.userResponses[i]">
+              <span>Attempted Question: </span> Skipped
+            </h3>
+          </div>
+          <ul>
+            <li
+              *ngFor="
+                let option of question.incorrectAnswers
+                  .concat(question.correctAnswer)
+                  .sort()
+              "
+              [ngClass]="{
+                response: trivia.userResponses[i] === option
+              }"
+              [ngClass]="{
+                correct:
+                  trivia.userResponses[i] &&
+                  option === question.correctAnswer &&
+                  option,
+                inCorrect:
+                  trivia.userResponses[i] &&
+                  trivia.userResponses[i] !== question.correctAnswer
+                    ? option === trivia.userResponses[i]
+                    : null
+              }"
+            >
+              {{ option }}
+            </li>
+          </ul>
+          <h3 class="correctAnswerText">
+            <span>Correct Answer: </span>
+            {{ question.correctAnswer }}
+          </h3>
+        </div>
+      </ng-container>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>

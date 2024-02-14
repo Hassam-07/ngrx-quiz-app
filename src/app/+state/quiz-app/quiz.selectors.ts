@@ -25,6 +25,14 @@ export const selectCategories = createSelector(
   selectTriviaState,
   (state) => state.categories
 );
+// export const selectCategoriesLoaded = createSelector(
+//   selectTriviaState,
+//   (state) => state.categoriesLoaded
+// );
+// export const selectCategoriesLoaded = createSelector(
+//   selectTriviaState,
+//   (state) => Object.keys(state.categories).length > 0
+// );
 
 export const selectScore = createSelector(
   selectTriviaState,

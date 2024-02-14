@@ -4,7 +4,7 @@
   align-items: center;
   flex-direction: column;
   gap: 2.3rem;
-  height: 100vh;
+  height: 90vh;
   .user-info {
     display: flex;
     flex-direction: column;
@@ -51,4 +51,38 @@
       box-shadow: none;
     }
   }
+}
+.window-flex {
+  display: flex;
+  flex-direction: column;
+  padding-left: 40px;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+  .attempted-question {
+    padding: 20px;
+    h3 {
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+  ul {
+    padding: 1rem 2rem;
+  }
+  span {
+    font-weight: 600;
+  }
+  .correctAnswerText {
+    padding: 0 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    font-style: italic;
+  }
+}
+
+.correct {
+  color: #2a9d8f;
+}
+
+.inCorrect {
+  color: red;
 }

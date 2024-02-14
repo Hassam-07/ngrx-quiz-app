@@ -1,5 +1,5 @@
 export interface Question {
-  category: string;
+  // category: string;
   id: string;
   correctAnswer: string;
   incorrectAnswers: string[];
@@ -11,4 +11,5 @@ export interface Question {
   difficulty: string;
   regions: string[];
   isNiche: boolean;
+  userResponses: string[];
 }
