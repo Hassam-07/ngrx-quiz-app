@@ -159,6 +159,9 @@ $transition: all 300ms ease-in-out;
       align-items: flex-start;
       justify-content: space-between;
       border-bottom: 1px solid #999;
+      &.attempted {
+        border-left: 6px solid #2ecc71;
+      }
 
       h3 {
         color: #999;

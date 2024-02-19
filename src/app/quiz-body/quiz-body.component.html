@@ -6,7 +6,10 @@
 <div (click)="closeSideWindow()">
   <div *ngIf="sideWindowVisible" class="side-window-container">
     <div class="side-window" (click)="$event.stopPropagation()">
-      <div
+      <div [ngClass]="{
+        attempted:
+          userResponses[i]
+      }"
         *ngFor="let question of questions; let i = index"
         class="window-flex"
       >
