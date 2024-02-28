@@ -20,6 +20,7 @@ export interface TriviaState {
   sideWindowVisible: boolean;
   optionWindowVisible: boolean;
   timerDuration: number;
+  options: string[];
 }
 
 export const initialState: TriviaState = {
@@ -36,8 +37,8 @@ export const initialState: TriviaState = {
   categories: {},
   sideWindowVisible: false,
   optionWindowVisible: false,
-  // uiTimer: '00:00',
   timerDuration: 0,
+  options: [],
 };
 
 export const quizReducer = createReducer(
@@ -76,17 +77,17 @@ export const quizReducer = createReducer(
       };
     }
   }),
-  on(QuizPageActions.skipQuestion, (state) => {
-    if (state.currentQuestionNumber < state.questions.length) {
-      return {
-        ...state,
-        currentQuestionNumber: state.currentQuestionNumber + 1,
-        selectedOption: undefined,
-      };
-    } else {
-      return { ...state, showFooter: false };
-    }
-  }),
+  // on(QuizPageActions.skipQuestion, (state) => {
+  //   if (state.currentQuestionNumber < state.questions.length) {
+  //     return {
+  //       ...state,
+  //       currentQuestionNumber: state.currentQuestionNumber + 1,
+  //       selectedOption: undefined,
+  //     };
+  //   } else {
+  //     return { ...state, showFooter: false };
+  //   }
+  // }),
   on(QuizPageActions.previousQuestion, (state) => {
     if (state.currentQuestionNumber > 1) {
       const previousQuestionIndex = state.currentQuestionNumber - 2;
@@ -162,8 +163,9 @@ export const quizReducer = createReducer(
           .sort(),
         currentQuestionNumber: currentQuestionNumber,
       };
+    } else {
+      return state;
     }
-    return state;
   }),
   on(QuizPageActions.openSideWindow, (state) => ({
     ...state,

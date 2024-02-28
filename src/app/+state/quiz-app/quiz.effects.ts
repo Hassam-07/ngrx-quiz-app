@@ -114,15 +114,6 @@ export class QuizEffects {
     )
   );
 
-  // stopTimer$ = createEffect(
-  //   () =>
-  //     this.actions$.pipe(
-  //       ofType(QuizPageActions.stopTimer),
-  //       map(() => this.router.navigate(['/results']))
-  //     ),
-  //   { dispatch: false }
-  // );
-
   stopTimer$ = createEffect(
     () =>
       this.actions$.pipe(

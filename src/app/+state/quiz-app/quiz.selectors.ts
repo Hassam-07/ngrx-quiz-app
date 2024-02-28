@@ -25,14 +25,6 @@ export const selectCategories = createSelector(
   selectTriviaState,
   (state) => state.categories
 );
-// export const selectCategoriesLoaded = createSelector(
-//   selectTriviaState,
-//   (state) => state.categoriesLoaded
-// );
-// export const selectCategoriesLoaded = createSelector(
-//   selectTriviaState,
-//   (state) => Object.keys(state.categories).length > 0
-// );
 
 export const selectScore = createSelector(
   selectTriviaState,
@@ -52,8 +44,6 @@ export const selectCurrentQuestion = createSelector(
   selectQuestions,
   selectCurrentQuestionNumber,
   (questions, currentQuestionNumber) => {
-    // console.log('hi', questions);
-    // console.log('currentQuestionNumber:', currentQuestionNumber);
     const adjustedIndex = currentQuestionNumber - 1;
 
     return {
@@ -66,17 +56,6 @@ export const selectCurrentQuestion = createSelector(
   }
 );
 
-// export const selectUiTimer = createSelector(
-//   selectTotalQuestions,
-//   (totalQuestions) => {
-//     const timerDuration = totalQuestions * 10;
-//     const minutes = Math.floor(timerDuration / 60);
-//     const seconds = timerDuration % 60;
-//     const formattedMinutes = String(minutes).padStart(2, '0');
-//     const formattedSeconds = String(seconds).padStart(2, '0');
-//     return `${formattedMinutes}:${formattedSeconds}`;
-//   }
-// );
 export const selectUsername = createSelector(
   selectTriviaState,
   (state) => state.username
@@ -107,14 +86,12 @@ export const selectCorrectAnswer = createSelector(
 export const selectSelectedOption = createSelector(
   selectTriviaState,
   (state) => {
-    // console.log('selected', state.response);
     return state.response;
   }
 );
 export const selectUserResponses = createSelector(
   selectTriviaState,
   (state) => {
-    // console.log('Responses saved as', state.userResponses);
     return state.userResponses;
   }
 );
