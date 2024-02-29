@@ -17,6 +17,8 @@ import {
   selectUiTimer,
   selectUsername,
   selectPercentageQuiz,
+  selectMessage,
+  selectFirstQuestion,
 } from './quiz.selectors';
 
 const mockState: TriviaState = {
@@ -59,7 +61,7 @@ const mockState: TriviaState = {
       userResponses: [],
     },
   ],
-  currentQuestionNumber: 2,
+  currentQuestionNumber: 1,
   score: 10,
   quizQuestions: true,
   currentQuestion: 'Question 2',
@@ -144,12 +146,40 @@ describe('Quiz App Selectors', () => {
     const result = selectQuizQuestions(mockRootState);
     expect(result).toBe(true);
   });
+  describe('First Question', () => {
+    it('should return true if current question number is 1', () => {
+      const result = selectFirstQuestion(mockRootState);
+
+      expect(result).toEqual(true);
+    });
+  });
 
   it('selectCorrectAnswer should return the correct answer when current question is available', () => {
     const result = selectCorrectAnswer(mockRootState);
     expect(result).toEqual(mockState.questions[1].correctAnswer);
   });
+  it('should return correct message based on percentage', () => {
+    const state = mockState;
+    const expectedPercentage = (state.score / state.questions.length) * 100;
+    let expectedMessage = '';
 
+    // Calculate expected message based on percentage
+    if (expectedPercentage === 100) {
+      expectedMessage = 'Excellent Job!😊👌';
+    } else if (expectedPercentage >= 80) {
+      expectedMessage = 'Good, keep it up!👌';
+    } else if (expectedPercentage >= 50) {
+      expectedMessage = 'Keep it up👌';
+    } else if (expectedPercentage >= 30) {
+      expectedMessage = 'Ohhh!, Prepare for the next time👍';
+    } else {
+      expectedMessage = 'You have failed the quiz!😒. better luck next time!👍';
+    }
+
+    const result = selectMessage(mockRootState);
+
+    expect(result).toEqual(expectedMessage);
+  });
   describe('selectCurrentQuestion selector', () => {
     const mockState = {
       currentQuestionNumber: 2,

@@ -8,8 +8,12 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { TestScheduler } from 'rxjs/testing';
-import { mockQuestion } from 'lib/src/lib/quiz-interface/mock-data.interface';
+import {
+  mockCategories,
+  mockQuestion,
+} from 'lib/src/lib/quiz-interface/mock-data.interface';
 import { Actions } from '@ngrx/effects';
+import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
 
 describe('QuizEffects', () => {
   let actions$: any;
@@ -26,7 +30,7 @@ describe('QuizEffects', () => {
     // actions$ = {
     //   pipe: jest.fn(), // Mock the pipe method
     // };
-    actions$ = of(QuizPageActions.startTimer());
+    // actions$ = of(QuizPageActions.startTimer());
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       providers: [
@@ -112,18 +116,47 @@ describe('QuizEffects', () => {
       flush();
     }));
   });
-
-  describe('loadCategories$', () => {
-    it('should load categories successfully', fakeAsync(() => {
-      const categories = { category1: ['question1', 'question2'] };
+  describe('loadCategories$ Effect', () => {
+    it('should load Categories successfully', fakeAsync(() => {
+      const categories = mockCategories;
       const action = QuizPageActions.loadCategories();
-      const state = { categories: {} };
+      jest.spyOn(quizService, 'getCategories').mockReturnValue(of(categories));
+      const state = {
+        geography: ['countries', 'cities', 'continents'],
+        history: ['ancient', 'modern', 'medieval'],
+        science: ['biology', 'physics', 'chemistry'],
+        sports: ['football', 'basketball', 'tennis'],
+        music: ['pop', 'rock', 'jazz'],
+      };
       actions$ = of(action);
       store.setState(state);
-      jest.spyOn(quizService, 'getCategories').mockReturnValue(of(categories));
-      // quizService.getCategories.and.returnValue(of(categories));
-
       const expected = QuizApiActions.loadCategoriesSuccess({ categories });
+
+      effects.loadTrivia$.subscribe((result) => {
+        expect(result).toEqual(expected);
+      });
+      flush();
+    }));
+
+    it('should filter when categories are not loaded', fakeAsync(() => {
+      const action = QuizPageActions.loadCategories();
+      const state = { quiz: { categories: {} } };
+      actions$ = of(action);
+      store.setState(state);
+
+      const expected = QuizApiActions.loadCategoriesSuccess({
+        categories: {
+          geography: ['countries', 'cities', 'continents'],
+          history: ['ancient', 'modern', 'medieval'],
+          science: ['biology', 'physics', 'chemistry'],
+          sports: ['football', 'basketball', 'tennis'],
+          music: ['pop', 'rock', 'jazz'],
+        },
+      });
+
+      jest
+        .spyOn(quizService, 'getCategories')
+        .mockReturnValue(of(expected.categories));
 
       effects.loadCategories$.subscribe((result) => {
         expect(result).toEqual(expected);
@@ -131,10 +164,33 @@ describe('QuizEffects', () => {
       flush();
     }));
 
+    it('should not load categories if categories are already loaded', fakeAsync(() => {
+      const action = QuizPageActions.loadCategories();
+
+      const stateWithCategories = {
+        quiz: {
+          categories: {
+            geography: ['countries', 'cities', 'continents'],
+            history: ['ancient', 'modern', 'medieval'],
+            science: ['biology', 'physics', 'chemistry'],
+            sports: ['football', 'basketball', 'tennis'],
+            music: ['pop', 'rock', 'jazz'],
+          },
+        },
+      };
+      actions$ = of(action);
+      store.setState(stateWithCategories);
+
+      effects.loadCategories$.subscribe((result) => {
+        expect(result).toBeUndefined();
+        expect(quizService.getCategories).not.toHaveBeenCalled();
+      });
+      flush();
+    }));
     it('should handle errors when loading categories', fakeAsync(() => {
       const error = new Error('Failed to load categories');
       const action = QuizPageActions.loadCategories();
-      const state = { categories: {} };
+      const state = { quiz: { categories: {} } };
       actions$ = of(action);
       store.setState(state);
       jest
@@ -149,19 +205,57 @@ describe('QuizEffects', () => {
       });
       flush();
     }));
-
-    it('should not load categories if categories are already loaded', fakeAsync(() => {
-      const action = QuizPageActions.loadCategories();
-      const state = { categories: { category1: ['question1', 'question2'] } };
-      actions$ = of(action);
-      store.setState(state);
-
-      effects.loadCategories$.subscribe((result) => {
-        expect(result).toBeUndefined();
-      });
-      flush();
-    }));
   });
+
+  // describe('loadCategories$', () => {
+  //   it('should load categories successfully', fakeAsync(() => {
+  //     const categories = { category1: ['question1', 'question2'] };
+  //     const action = QuizPageActions.loadCategories();
+  //     const state = { categories: {} };
+  //     actions$ = of(action);
+  //     store.setState(state);
+  //     jest.spyOn(quizService, 'getCategories').mockReturnValue(of(categories));
+  //     // quizService.getCategories.and.returnValue(of(categories));
+
+  //     const expected = QuizApiActions.loadCategoriesSuccess({ categories });
+
+  //     effects.loadCategories$.subscribe((result) => {
+  //       expect(result).toEqual(expected);
+  //     });
+  //     flush();
+  //   }));
+
+  //   it('should handle errors when loading categories', fakeAsync(() => {
+  //     const error = new Error('Failed to load categories');
+  //     const action = QuizPageActions.loadCategories();
+  //     const state = { categories: {} };
+  //     actions$ = of(action);
+  //     store.setState(state);
+  //     jest
+  //       .spyOn(quizService, 'getCategories')
+  //       .mockReturnValue(throwError(error));
+  //     // quizService.getCategories.and.returnValue(throwError(error));
+
+  //     const expected = QuizApiActions.loadCategoriesFailure({ error });
+
+  //     effects.loadCategories$.subscribe((result) => {
+  //       expect(result).toEqual(expected);
+  //     });
+  //     flush();
+  //   }));
+
+  //   it('should not load categories if categories are already loaded', fakeAsync(() => {
+  //     const action = QuizPageActions.loadCategories();
+  //     const state = { categories: { category1: ['question1', 'question2'] } };
+  //     actions$ = of(action);
+  //     store.setState(state);
+
+  //     effects.loadCategories$.subscribe((result) => {
+  //       expect(result).toBeUndefined();
+  //     });
+  //     flush();
+  //   }));
+  // });
 
   describe('navigateToResults$', () => {
     it('should navigate to results when finishQuiz action is dispatched', fakeAsync(() => {
@@ -200,26 +294,26 @@ describe('QuizEffects', () => {
   });
 
   describe('StartTimer$ effect ', () => {
-    // it('should emit timerTick action every second until stopTimer action is dispatched', fakeAsync(() => {
-    //   const startTimerAction = QuizPageActions.startTimer();
-    //   const timerTickAction = QuizPageActions.timerTick();
-    //   const stopTimerAction = QuizPageActions.stopTimer();
-    //   actions$ = of(startTimerAction);
-    //   let count = 0;
-    //   effects.startTimer$.subscribe((action) => {
-    //     if (count === 3) {
-    //       expect(action).toEqual(stopTimerAction); // Verify stopTimer action emitted after 3 seconds
-    //     } else {
-    //       expect(action).toEqual(timerTickAction); // Verify timerTick action emitted every second
-    //     }
-    //     console.log(count);
-    //     count++;
-    //     actions$ = of(stopTimerAction);
-    //   });
+    it('should emit timerTick action every second until stopTimer action is dispatched', fakeAsync(() => {
+      const startTimerAction = QuizPageActions.startTimer();
+      const timerTickAction = QuizPageActions.timerTick();
+      const stopTimerAction = QuizPageActions.stopTimer();
+      actions$ = of(startTimerAction);
+      let count = 0;
+      effects.startTimer$.subscribe((action) => {
+        if (count === 3) {
+          expect(action).toEqual(stopTimerAction); // Verify stopTimer action emitted after 3 seconds
+        } else {
+          expect(action).toEqual(timerTickAction); // Verify timerTick action emitted every second
+        }
+        console.log(count);
+        count++;
+        actions$ = of(stopTimerAction);
+      });
 
-    //   tick(3000); // Advance time by 3 seconds
-    //   flush();
-    // }));
+      tick(3000); // Advance time by 3 seconds
+      flush();
+    }));
   });
 
   // describe('stopTimer$', () => {

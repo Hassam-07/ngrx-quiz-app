@@ -37,9 +37,9 @@ export class QuizComponent implements OnInit {
     this.categories$ = this.store.select(selectCategories);
     this.timerDuration$ = this.store.select(selectTimerDuration);
     this.quizViewState$ = this.store.select(selectQuizView);
-    this.isFirstQuestion$ = this.quizViewState$.pipe(
-      map((quizViewState) => quizViewState.currentQuestionNumber === 1)
-    );
+    // this.isFirstQuestion$ = this.quizViewState$.pipe(
+    //   map((quizViewState) => quizViewState.currentQuestionNumber === 1)
+    // );
     this.store.dispatch(QuizPageActions.startTimer());
     // this.timerDuration$.subscribe((timerDuration) => {
     //   if (timerDuration === 0) {
