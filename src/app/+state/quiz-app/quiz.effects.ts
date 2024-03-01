@@ -102,9 +102,6 @@ export class QuizEffects {
   startTimer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuizPageActions.startTimer),
-      tap((time) => {
-        console.log('effects Timer', time);
-      }),
       mergeMap(() =>
         interval(1000).pipe(
           map(() => QuizPageActions.timerTick()),

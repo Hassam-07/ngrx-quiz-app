@@ -9,7 +9,7 @@
             Your final score: {{ trivia.score }} / {{ trivia.questions.length }}
           </h2>
           <h3>Percentage: {{ trivia.percentage }}%</h3>
-          <h3>{{ message$ | async }}</h3>
+          <h3>{{ trivia.message }}</h3>
         </div>
         <button class="restartQuiz" (click)="restartQuiz()">
           Restart Quiz

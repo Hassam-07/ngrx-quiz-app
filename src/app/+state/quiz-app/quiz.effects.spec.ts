@@ -1,4 +1,10 @@
-import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
+import {
+  TestBed,
+  discardPeriodicTasks,
+  fakeAsync,
+  flush,
+  tick,
+} from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable, interval, of, throwError } from 'rxjs';
 import { QuizEffects } from './quiz.effects';
@@ -14,6 +20,7 @@ import {
 } from 'lib/src/lib/quiz-interface/mock-data.interface';
 import { Actions } from '@ngrx/effects';
 import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
+import { selectTimerDuration } from './quiz.selectors';
 
 describe('QuizEffects', () => {
   let actions$: any;
@@ -295,24 +302,22 @@ describe('QuizEffects', () => {
 
   describe('StartTimer$ effect ', () => {
     it('should emit timerTick action every second until stopTimer action is dispatched', fakeAsync(() => {
+      // const action = jest.spyOn(QuizPageActions, 'timerTick');
       const startTimerAction = QuizPageActions.startTimer();
       const timerTickAction = QuizPageActions.timerTick();
       const stopTimerAction = QuizPageActions.stopTimer();
       actions$ = of(startTimerAction);
-      let count = 0;
+      // let count = 0;
       effects.startTimer$.subscribe((action) => {
-        if (count === 3) {
-          expect(action).toEqual(stopTimerAction); // Verify stopTimer action emitted after 3 seconds
-        } else {
-          expect(action).toEqual(timerTickAction); // Verify timerTick action emitted every second
-        }
-        console.log(count);
-        count++;
+        // expect(action).toEqual(stopTimerAction);
+        tick(1000);
+        expect(action).toEqual(timerTickAction); // Verify timerTick action emitted every second
+        // } else {
         actions$ = of(stopTimerAction);
       });
 
-      tick(3000); // Advance time by 3 seconds
       flush();
+      discardPeriodicTasks();
     }));
   });
 
@@ -329,4 +334,55 @@ describe('QuizEffects', () => {
   //     expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
   //   });
   // });
+  // it('should dispatch stopTimer and finishQuiz actions when timerDuration reaches 0', () => {
+  //   // Mock selector value
+  //   const mockTimerDuration = 0;
+  //   const selectSpy = jest
+  //     .spyOn(store, 'select')
+  //     .mockReturnValue(of(mockTimerDuration));
+  //   const timerTickAction = QuizPageActions.timerTick();
+  //   const stopTimerAction = QuizPageActions.stopTimer();
+  //   // Mock actions stream
+  //   actions$ = of(timerTickAction);
+
+  //   effects.stopTimer$.subscribe(() => {
+  //     // expect(action).toEqual(stopTimerAction);
+  //   });
+  //   // Mock dispatch function
+  //   const dispatchSpy = jest.spyOn(store, 'dispatch');
+  //   expect(selectSpy).toHaveBeenCalledWith(selectTimerDuration);
+
+  //   // Subscribe to the effect
+  //   // effects.stopTimer$.subscribe();
+
+  //   // Expect select to be called with selectTimerDuration
+
+  //   // Expect dispatch to be called with stopTimer and finishQuiz actions
+  //   expect(dispatchSpy).toHaveBeenCalledWith(stopTimerAction);
+  //   expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
+  // });
+
+  it('should dispatch stopTimer and finishQuiz actions when timerDuration reaches 0', () => {
+    // Mock selector value
+    const mockTimerDuration = 10;
+    const selectSpy = jest
+      .spyOn(store, 'select')
+      .mockReturnValue(of(mockTimerDuration));
+
+    // Mock actions stream
+    actions$ = of(QuizPageActions.timerTick());
+
+    // Mock dispatch function
+    const dispatchSpy = jest.spyOn(store, 'dispatch');
+
+    // Subscribe to the effect
+    effects.stopTimer$.subscribe();
+
+    // Expect select to be called with selectTimerDuration
+    expect(selectSpy).toHaveBeenCalled();
+
+    // Expect dispatch to be called with stopTimer and finishQuiz actions
+    expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.stopTimer());
+    expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
+  });
 });

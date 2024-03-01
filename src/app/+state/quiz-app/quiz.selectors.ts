@@ -108,6 +108,19 @@ export const selectOptionWindowVisible = createSelector(
   selectTriviaState,
   (state) => state.optionWindowVisible
 );
+export const selectMessage = createSelector(selectPercentageQuiz, (percentage) => {
+  if (percentage === 100) {
+    return 'Excellent Job!😊👌';
+  } else if (percentage >= 80) {
+    return 'Good, keep it up!👌';
+  } else if (percentage >= 50) {
+    return 'Keep it up👌';
+  } else if (percentage >= 30) {
+    return 'Ohhh!, Prepare for the next time👍';
+  } else {
+    return 'You have failed the quiz!😒. better luck next time!👍';
+  }
+});
 
 export const selectQuizView = createSelector(
   selectQuestions,
@@ -125,6 +138,7 @@ export const selectQuizView = createSelector(
   selectUsername,
   selectPercentageQuiz,
   selectFirstQuestion,
+  selectMessage,
   (
     questions,
     currentQuestion,
@@ -140,7 +154,8 @@ export const selectQuizView = createSelector(
     uiTimer,
     username,
     percentage,
-    FirstQuestion
+    FirstQuestion,
+    message,
   ) => ({
     questions,
     currentQuestion,
@@ -157,19 +172,8 @@ export const selectQuizView = createSelector(
     username,
     percentage,
     FirstQuestion,
+    message,
   })
 );
 
-export const selectMessage = createSelector(selectQuizView, (quizViewState) => {
-  if (quizViewState.percentage === 100) {
-    return 'Excellent Job!😊👌';
-  } else if (quizViewState.percentage >= 80) {
-    return 'Good, keep it up!👌';
-  } else if (quizViewState.percentage >= 50) {
-    return 'Keep it up👌';
-  } else if (quizViewState.percentage >= 30) {
-    return 'Ohhh!, Prepare for the next time👍';
-  } else {
-    return 'You have failed the quiz!😒. better luck next time!👍';
-  }
-});
+

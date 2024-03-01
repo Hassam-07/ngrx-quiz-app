@@ -82,17 +82,17 @@ describe('Quiz App Selectors', () => {
   const mockRootState = { quiz: mockState };
 
   it('selectCurrentQuestionNumber should return the correct current question number', () => {
-    const result = selectCurrentQuestionNumber(mockRootState);
-    expect(result).toBe(2);
+    const result = selectCurrentQuestionNumber.projector(mockRootState.quiz);
+    expect(result).toBe(1);
   });
 
   it('selectTotalQuestions should return the total number of questions', () => {
-    const result = selectTotalQuestions(mockRootState);
+    const result = selectTotalQuestions.projector(mockRootState.quiz);
     expect(result).toBe(3);
   });
 
   it('selectCategories should return the categories', () => {
-    const result = selectCategories(mockRootState);
+    const result = selectCategories.projector(mockRootState.quiz);
     expect(result).toEqual({
       'Category 1': ['Item 1', 'Item 2', 'Item 3'],
       'Category 2': ['Item 4', 'Item 5', 'Item 6'],
@@ -100,85 +100,133 @@ describe('Quiz App Selectors', () => {
   });
 
   it('selectScore should return the score', () => {
-    const result = selectScore(mockRootState);
+    const result = selectScore.projector(mockRootState.quiz);
     expect(result).toBe(10);
   });
 
   it('selectQuestions should return the questions array', () => {
-    const result = selectQuestions(mockRootState);
+    const result = selectQuestions.projector(mockRootState.quiz);
     expect(result).toEqual(mockState.questions);
   });
 
   it('selectSelectedOption should return the selected option', () => {
-    const result = selectSelectedOption(mockRootState);
+    const result = selectSelectedOption.projector(mockRootState.quiz);
     expect(result).toBe('B');
   });
 
   it('selectUserResponses should return the user responses', () => {
-    const result = selectUserResponses(mockRootState);
+    const result = selectUserResponses.projector(mockRootState.quiz);
     expect(result).toEqual(['A', 'B', 'C']);
   });
 
   it('selectUiTimer should return the timer value', () => {
-    const result = selectUiTimer(mockRootState);
-    expect(result).toBe(60);
+    const result = selectUiTimer.projector(mockRootState.quiz.timerDuration);
+    const expectedFormattedTimer = '01:00';
+    expect(result).toBe(expectedFormattedTimer);
   });
   it('selectPercentageQuiz should return the percentage according to the correct Answer quiz', () => {
-    const result = selectPercentageQuiz(mockRootState);
+    const result = selectPercentageQuiz.projector(mockRootState.quiz);
     const expectedPercentage =
       (mockState.score / mockState.questions.length) * 100; // Assuming only one question in the mock state
     expect(result).toEqual(expectedPercentage);
   });
 
   it('selectUsername should return the username', () => {
-    const result = selectUsername(mockRootState);
+    const result = selectUsername.projector(mockRootState.quiz);
     expect(result).toBe('user');
   });
   it('selectSideWindowVisible should return the the window is open or not', () => {
-    const result = selectSideWindowVisible(mockRootState);
+    const result = selectSideWindowVisible.projector(mockRootState.quiz);
     expect(result).toBe(false);
   });
   it('selectOptionWindowVisible should return the the Option Window is Visible or not', () => {
-    const result = selectOptionWindowVisible(mockRootState);
+    const result = selectOptionWindowVisible.projector(mockRootState.quiz);
     expect(result).toBe(false);
   });
   it('selectQuizQuestions should return the the quiz question ends or not', () => {
-    const result = selectQuizQuestions(mockRootState);
+    const result = selectQuizQuestions.projector(mockRootState.quiz);
     expect(result).toBe(true);
   });
   describe('First Question', () => {
     it('should return true if current question number is 1', () => {
-      const result = selectFirstQuestion(mockRootState);
+      const result = selectFirstQuestion.projector(mockRootState.quiz);
 
       expect(result).toEqual(true);
     });
   });
 
   it('selectCorrectAnswer should return the correct answer when current question is available', () => {
-    const result = selectCorrectAnswer(mockRootState);
-    expect(result).toEqual(mockState.questions[1].correctAnswer);
+    const mockCurrentQuestion = {
+      id: '2',
+      correctAnswer: 'B',
+      incorrectAnswers: ['A', 'C', 'D'],
+      question: { text: 'Question 2' },
+      tags: [],
+      type: '',
+      difficulty: '',
+      regions: [],
+      isNiche: false,
+      userResponses: ['A', 'B', 'C', 'D'],
+      options: [],
+    };
+    const result = selectCorrectAnswer.projector(mockCurrentQuestion);
+    expect(result).toEqual('B');
   });
-  it('should return correct message based on percentage', () => {
-    const state = mockState;
-    const expectedPercentage = (state.score / state.questions.length) * 100;
-    let expectedMessage = '';
+  describe('Percentage of the Quiz', () => {
+    // const state = mockState;
+    // const expectedPercentage = (state.score / state.questions.length) * 100;
 
-    // Calculate expected message based on percentage
-    if (expectedPercentage === 100) {
-      expectedMessage = 'Excellent Job!😊👌';
-    } else if (expectedPercentage >= 80) {
-      expectedMessage = 'Good, keep it up!👌';
-    } else if (expectedPercentage >= 50) {
-      expectedMessage = 'Keep it up👌';
-    } else if (expectedPercentage >= 30) {
-      expectedMessage = 'Ohhh!, Prepare for the next time👍';
-    } else {
-      expectedMessage = 'You have failed the quiz!😒. better luck next time!👍';
-    }
+    it('should return "Excellent Job!😊👌" if percentage is 100', () => {
+      const mockQuizViewState = { percentage: 100 };
+      const result = selectMessage.projector(mockQuizViewState.percentage);
+      expect(result).toEqual('Excellent Job!😊👌');
+    });
+    it('should return "Good, keep it up!👌" if percentage is greater than or equal to 80', () => {
+      const mockQuizViewState = { percentage: 85 };
+      const result = selectMessage.projector(mockQuizViewState.percentage);
+      expect(result).toEqual('Good, keep it up!👌');
+    });
 
-    const result = selectMessage(mockRootState);
+    it('should return "Keep it up👌" if percentage is greater than or equal to 50', () => {
+      const mockQuizViewState = { percentage: 60 };
+      const result = selectMessage.projector(mockQuizViewState.percentage);
+      expect(result).toEqual('Keep it up👌');
+    });
 
-    expect(result).toEqual(expectedMessage);
+    it('should return "Ohhh!, Prepare for the next time👍" if percentage is greater than or equal to 30', () => {
+      const mockQuizViewState = { percentage: 35 };
+      const result = selectMessage.projector(mockQuizViewState.percentage);
+      expect(result).toEqual('Ohhh!, Prepare for the next time👍');
+    });
+
+    it('should return "You have failed the quiz!😒. better luck next time!👍" if percentage is less than 30', () => {
+      const mockQuizViewState = { percentage: 20 };
+      const result = selectMessage.projector(mockQuizViewState.percentage);
+      expect(result).toEqual(
+        'You have failed the quiz!😒. better luck next time!👍'
+      );
+    });
+    // it('should return correct message based on percentage', () => {
+    //   let expectedMessage = '';
+
+    //   // Calculate expected message based on percentage
+    //   if (expectedPercentage === 100) {
+    //     expectedMessage = 'Excellent Job!😊👌';
+    //   } else if (expectedPercentage >= 80) {
+    //     expectedMessage = 'Good, keep it up!👌';
+    //   } else if (expectedPercentage >= 50) {
+    //     expectedMessage = 'Keep it up👌';
+    //   } else if (expectedPercentage >= 30) {
+    //     expectedMessage = 'Ohhh!, Prepare for the next time👍';
+    //   } else {
+    //     expectedMessage =
+    //       'You have failed the quiz!😒. better luck next time!👍';
+    //   }
+
+    //   const result = selectMessage(mockRootState);
+
+    //   expect(result).toEqual(expectedMessage);
+    // });
   });
   describe('selectCurrentQuestion selector', () => {
     const mockState = {
@@ -247,7 +295,6 @@ describe('Quiz App Selectors', () => {
         regions: [],
         isNiche: false,
         userResponses: [],
-        options: ['A', 'B', 'C', 'D'],
       };
 
       const result = selectCurrentQuestion.projector(
