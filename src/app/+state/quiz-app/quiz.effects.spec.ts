@@ -21,6 +21,7 @@ import {
 import { Actions } from '@ngrx/effects';
 import { Categories } from 'lib/src/lib/quiz-interface/categories.interface';
 import { selectTimerDuration } from './quiz.selectors';
+import { Store } from '@ngrx/store';
 
 describe('QuizEffects', () => {
   let actions$: any;
@@ -43,7 +44,9 @@ describe('QuizEffects', () => {
       providers: [
         QuizEffects,
         provideMockActions(() => actions$),
-        provideMockStore(),
+        provideMockStore({
+          selectors: [{ selector: selectTimerDuration, value: 0 }],
+        }),
         // { provide: Actions, useValue: actions$ },
         {
           provide: QuizAppService,
@@ -78,15 +81,20 @@ describe('QuizEffects', () => {
       const action = QuizPageActions.submitForm({
         formValue: { username: 'testUser' },
       });
+
       actions$ = of(action);
 
-      jest.spyOn(quizService, 'getTrivia').mockReturnValue(of(trivia));
+      // const actionsSpy = jest.spyOn(QuizPageActions, 'submitForm');
+      const service = jest
+        .spyOn(quizService, 'getTrivia')
+        .mockReturnValue(of(trivia));
 
       const expected = QuizApiActions.triviaLoadedSuccess({ trivia });
-
       effects.loadTrivia$.subscribe((result) => {
-        console.log('load trivia');
+        console.log('load trivia', result);
         expect(result).toEqual(expected);
+        expect(result).toEqual(action);
+        expect(service).toHaveBeenCalled();
       });
       flush();
     }));
@@ -98,11 +106,16 @@ describe('QuizEffects', () => {
       });
 
       actions$ = of(action);
-      jest.spyOn(quizService, 'getTrivia').mockReturnValue(throwError(error));
+      const service = jest
+        .spyOn(quizService, 'getTrivia')
+        .mockReturnValue(throwError(error));
 
       effects.loadTrivia$.subscribe((resultAction) => {
         expect(resultAction).toEqual(QuizApiActions.loadQuizFailure({ error }));
+        expect(service).toHaveBeenCalled();
       });
+
+      // expect(action).toHaveBeenCalled();
       flush();
     }));
 
@@ -113,21 +126,28 @@ describe('QuizEffects', () => {
       });
       actions$ = of(action);
 
-      jest.spyOn(quizService, 'getTrivia').mockReturnValue(throwError(error));
+      const service = jest
+        .spyOn(quizService, 'getTrivia')
+        .mockReturnValue(throwError(error));
 
       const expected = QuizApiActions.loadQuizFailure({ error });
 
       effects.loadTrivia$.subscribe((result) => {
         expect(result).toEqual(expected);
+        expect(service).toHaveBeenCalled();
       });
+      // expect(action).toHaveBeenCalled();
       flush();
     }));
   });
+
   describe('loadCategories$ Effect', () => {
     it('should load Categories successfully', fakeAsync(() => {
       const categories = mockCategories;
       const action = QuizPageActions.loadCategories();
-      jest.spyOn(quizService, 'getCategories').mockReturnValue(of(categories));
+      const service = jest
+        .spyOn(quizService, 'getCategories')
+        .mockReturnValue(of(categories));
       const state = {
         geography: ['countries', 'cities', 'continents'],
         history: ['ancient', 'modern', 'medieval'],
@@ -141,6 +161,7 @@ describe('QuizEffects', () => {
 
       effects.loadTrivia$.subscribe((result) => {
         expect(result).toEqual(expected);
+        expect(service).toHaveBeenCalled();
       });
       flush();
     }));
@@ -214,56 +235,6 @@ describe('QuizEffects', () => {
     }));
   });
 
-  // describe('loadCategories$', () => {
-  //   it('should load categories successfully', fakeAsync(() => {
-  //     const categories = { category1: ['question1', 'question2'] };
-  //     const action = QuizPageActions.loadCategories();
-  //     const state = { categories: {} };
-  //     actions$ = of(action);
-  //     store.setState(state);
-  //     jest.spyOn(quizService, 'getCategories').mockReturnValue(of(categories));
-  //     // quizService.getCategories.and.returnValue(of(categories));
-
-  //     const expected = QuizApiActions.loadCategoriesSuccess({ categories });
-
-  //     effects.loadCategories$.subscribe((result) => {
-  //       expect(result).toEqual(expected);
-  //     });
-  //     flush();
-  //   }));
-
-  //   it('should handle errors when loading categories', fakeAsync(() => {
-  //     const error = new Error('Failed to load categories');
-  //     const action = QuizPageActions.loadCategories();
-  //     const state = { categories: {} };
-  //     actions$ = of(action);
-  //     store.setState(state);
-  //     jest
-  //       .spyOn(quizService, 'getCategories')
-  //       .mockReturnValue(throwError(error));
-  //     // quizService.getCategories.and.returnValue(throwError(error));
-
-  //     const expected = QuizApiActions.loadCategoriesFailure({ error });
-
-  //     effects.loadCategories$.subscribe((result) => {
-  //       expect(result).toEqual(expected);
-  //     });
-  //     flush();
-  //   }));
-
-  //   it('should not load categories if categories are already loaded', fakeAsync(() => {
-  //     const action = QuizPageActions.loadCategories();
-  //     const state = { categories: { category1: ['question1', 'question2'] } };
-  //     actions$ = of(action);
-  //     store.setState(state);
-
-  //     effects.loadCategories$.subscribe((result) => {
-  //       expect(result).toBeUndefined();
-  //     });
-  //     flush();
-  //   }));
-  // });
-
   describe('navigateToResults$', () => {
     it('should navigate to results when finishQuiz action is dispatched', fakeAsync(() => {
       const action = QuizPageActions.finishQuiz();
@@ -272,6 +243,7 @@ describe('QuizEffects', () => {
       effects.navigateToResults$.subscribe(() => {
         expect(router.navigate).toHaveBeenCalledWith(['/results']);
       });
+      // expect(action).toHaveBeenCalled();
       flush();
     }));
   });
@@ -284,6 +256,7 @@ describe('QuizEffects', () => {
       effects.navigateToQuiz$.subscribe(() => {
         expect(router.navigate).toHaveBeenCalledWith(['/quizstart']);
       });
+      // expect(action).toHaveBeenCalled();
       flush();
     }));
   });
@@ -296,93 +269,118 @@ describe('QuizEffects', () => {
       effects.restartQuiz$.subscribe(() => {
         expect(router.navigate).toHaveBeenCalledWith(['/']);
       });
+      // expect(action).toHaveBeenCalled();
       flush();
     }));
   });
 
   describe('StartTimer$ effect ', () => {
     it('should emit timerTick action every second until stopTimer action is dispatched', fakeAsync(() => {
-      // const action = jest.spyOn(QuizPageActions, 'timerTick');
       const startTimerAction = QuizPageActions.startTimer();
       const timerTickAction = QuizPageActions.timerTick();
       const stopTimerAction = QuizPageActions.stopTimer();
+      const action = jest.spyOn(QuizPageActions, 'timerTick');
       actions$ = of(startTimerAction);
       // let count = 0;
       effects.startTimer$.subscribe((action) => {
         // expect(action).toEqual(stopTimerAction);
-        tick(1000);
-        expect(action).toEqual(timerTickAction); // Verify timerTick action emitted every second
+        console.log('start timer subsribe');
         // } else {
-        actions$ = of(stopTimerAction);
       });
-
+      tick(1000);
+      expect(action).toHaveBeenCalled(); // Verify timerTick action emitted every second
+      actions$ = of(stopTimerAction);
       flush();
       discardPeriodicTasks();
     }));
   });
 
-  // describe('stopTimer$', () => {
-  //   it('should dispatch stopTimer and finishQuiz actions when timerDuration reaches 0', () => {
-  //     const spy = jest.spyOn(store, 'pipe').mockReturnValue(of(0));
-  //     const dispatchSpy = jest.spyOn(store, 'dispatch');
+  describe('stopTimer$', () => {
+    // it('should dispatch stopTimer and finishQuiz actions when timer duration reaches 0', () => {
+    //   // Mocking timer duration as 0
+    //   store.overrideSelector(selectTimerDuration, 0);
+    //   const mockTimerDuration = 0;
+    //   const storeMock = jest
+    //     .spyOn(store, 'pipe')
+    //     .mockReturnValue(of(mockTimerDuration));
+    //   // Creating a spy on store.dispatch to check if expected actions are dispatched
+    //   const dispatchSpy = jest.spyOn(store, 'dispatch');
 
-  //     actions$ = of(QuizPageActions.timerTick());
-  //     effects.stopTimer$.subscribe();
+    //   // Dispatching a timerTick action
+    //   actions$ = of(QuizPageActions.timerTick());
 
-  //     expect(spy).toHaveBeenCalled();
-  //     expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.stopTimer());
-  //     expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
-  //   });
-  // });
-  // it('should dispatch stopTimer and finishQuiz actions when timerDuration reaches 0', () => {
-  //   // Mock selector value
-  //   const mockTimerDuration = 0;
-  //   const selectSpy = jest
-  //     .spyOn(store, 'select')
-  //     .mockReturnValue(of(mockTimerDuration));
-  //   const timerTickAction = QuizPageActions.timerTick();
-  //   const stopTimerAction = QuizPageActions.stopTimer();
-  //   // Mock actions stream
-  //   actions$ = of(timerTickAction);
+    //   // Subscribing to the effect
+    //   effects.stopTimer$.subscribe();
 
-  //   effects.stopTimer$.subscribe(() => {
-  //     // expect(action).toEqual(stopTimerAction);
-  //   });
-  //   // Mock dispatch function
-  //   const dispatchSpy = jest.spyOn(store, 'dispatch');
-  //   expect(selectSpy).toHaveBeenCalledWith(selectTimerDuration);
+    //   // Expecting the stopTimer and finishQuiz actions to be dispatched
+    //   expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.stopTimer());
+    //   expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
+    // });
 
-  //   // Subscribe to the effect
-  //   // effects.stopTimer$.subscribe();
+    // it('should not dispatch any actions when timer duration is not 0', () => {
+    //   // Mocking timer duration as non-zero
+    //   store.overrideSelector(selectTimerDuration, 10);
 
-  //   // Expect select to be called with selectTimerDuration
+    //   // Creating a spy on store.dispatch to check if any action is dispatched
+    //   const dispatchSpy = jest.spyOn(store, 'dispatch');
 
-  //   // Expect dispatch to be called with stopTimer and finishQuiz actions
-  //   expect(dispatchSpy).toHaveBeenCalledWith(stopTimerAction);
-  //   expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
-  // });
+    //   // Dispatching a timerTick action
+    //   actions$ = of(QuizPageActions.timerTick());
 
-  it('should dispatch stopTimer and finishQuiz actions when timerDuration reaches 0', () => {
-    // Mock selector value
-    const mockTimerDuration = 10;
-    const selectSpy = jest
-      .spyOn(store, 'select')
-      .mockReturnValue(of(mockTimerDuration));
+    //   // Subscribing to the effect
+    //   effects.stopTimer$.subscribe();
 
-    // Mock actions stream
-    actions$ = of(QuizPageActions.timerTick());
+    //   // Expecting no action to be dispatched
+    //   expect(dispatchSpy).not.toHaveBeenCalled();
+    // });
 
-    // Mock dispatch function
-    const dispatchSpy = jest.spyOn(store, 'dispatch');
+    it('should dispatch stopTimer and finishQuiz actions when timerDuration is 0', fakeAsync(() => {
+      const mockTimerDuration = 0;
 
-    // Subscribe to the effect
-    effects.stopTimer$.subscribe();
+      actions$ = of(QuizPageActions.timerTick());
+      const storeMock = jest
+        .spyOn(store, 'pipe')
+        .mockReturnValue(of(mockTimerDuration));
+      const dispatchSpy = jest.spyOn(store, 'dispatch');
+      effects.stopTimer$.subscribe();
+      tick();
+      expect(storeMock).toHaveBeenCalled();
+      expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.stopTimer());
+      expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
+      flush();
+      discardPeriodicTasks();
+    }));
+    it('should not dispatch any action when timerDuration is not 0', fakeAsync(() => {
+      const mockTimerDuration = 10;
 
-    // Expect select to be called with selectTimerDuration
-    expect(selectSpy).toHaveBeenCalled();
+      actions$ = of(QuizPageActions.timerTick());
+      const storeMock = jest
+        .spyOn(store, 'pipe')
+        .mockReturnValue(of(mockTimerDuration));
+      const dispatchSpy = jest.spyOn(store, 'dispatch');
+      effects.stopTimer$.subscribe();
 
-    // Expect dispatch to be called with stopTimer and finishQuiz actions
-    expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.stopTimer());
-    expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
+      tick();
+
+      expect(storeMock).toHaveBeenCalled();
+      expect(dispatchSpy).not.toHaveBeenCalledWith(QuizPageActions.stopTimer());
+      expect(dispatchSpy).not.toHaveBeenCalledWith(
+        QuizPageActions.finishQuiz()
+      );
+      flush();
+    }));
+    it('should select timer duration from the store using concatLatestFrom', fakeAsync(() => {
+      const mockTimerDuration = 5;
+      actions$ = of(QuizPageActions.timerTick());
+
+      const selectSpy = jest
+        .spyOn(store, 'pipe')
+        .mockReturnValue(of(mockTimerDuration));
+      effects.stopTimer$.subscribe();
+
+      tick();
+
+      expect(selectSpy).toHaveBeenCalledWith(selectTimerDuration);
+    }));
   });
 });

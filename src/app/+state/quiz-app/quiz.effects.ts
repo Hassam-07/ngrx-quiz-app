@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { createEffect, Actions, ofType } from '@ngrx/effects';
+import { createEffect, Actions, ofType, concatLatestFrom } from '@ngrx/effects';
 import {
   switchMap,
   catchError,
@@ -34,6 +34,9 @@ export class QuizEffects {
   loadTrivia$ = createEffect(() =>
     this.actions$.pipe(
       ofType(QuizPageActions.submitForm),
+      tap((data) => {
+        console.log('submit:', data);
+      }),
       mergeMap((action) =>
         this.quizService.getTrivia(action.formValue).pipe(
           tap((data) => {
@@ -41,7 +44,7 @@ export class QuizEffects {
           }),
           map((trivia) => QuizApiActions.triviaLoadedSuccess({ trivia })),
           catchError((error) => {
-            console.error('Error in loadTodos effect:', error);
+            // console.error('Error in loadTodos effect:', error);
             return of(QuizApiActions.loadQuizFailure({ error }));
           })
         )
@@ -110,23 +113,37 @@ export class QuizEffects {
       )
     )
   );
-
   stopTimer$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(QuizPageActions.timerTick),
-        switchMap(() =>
-          this.store.pipe(
-            select(selectTimerDuration),
-            tap((timerDuration) => {
-              if (timerDuration === 0) {
-                this.store.dispatch(QuizPageActions.stopTimer());
-                this.store.dispatch(QuizPageActions.finishQuiz());
-              }
-            })
-          )
-        )
+        concatLatestFrom(() => this.store.pipe(select(selectTimerDuration))),
+        tap(([action, timerDuration]) => {
+          if (timerDuration === 0) {
+            this.store.dispatch(QuizPageActions.stopTimer());
+            this.store.dispatch(QuizPageActions.finishQuiz());
+          }
+        })
       ),
     { dispatch: false }
   );
+
+  // stopTimer$ = createEffect(
+  //   () =>
+  //     this.actions$.pipe(
+  //       ofType(QuizPageActions.timerTick),
+  //       concatLatestFrom(() => this.store.pipe(select(selectTimerDuration))),
+  //       switchMap(() =>
+  //         this.store.pipe(
+  //           tap((timerDuration) => {
+  //             if (timerDuration === 0) {
+  //               this.store.dispatch(QuizPageActions.stopTimer());
+  //               this.store.dispatch(QuizPageActions.finishQuiz());
+  //             }
+  //           })
+  //         )
+  //       )
+  //     ),
+  //   { dispatch: false }
+  // );
 }
