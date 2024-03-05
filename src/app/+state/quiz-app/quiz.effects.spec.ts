@@ -30,15 +30,12 @@ describe('QuizEffects', () => {
   let router: Router;
   let store: MockStore;
   let testScheduler: TestScheduler;
+  // let store: any;
   const routerSpy = {
     navigate: jest.fn(),
   };
 
   beforeEach(() => {
-    // actions$ = {
-    //   pipe: jest.fn(), // Mock the pipe method
-    // };
-    // actions$ = of(QuizPageActions.startTimer());
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       providers: [
@@ -335,52 +332,33 @@ describe('QuizEffects', () => {
     // });
 
     it('should dispatch stopTimer and finishQuiz actions when timerDuration is 0', fakeAsync(() => {
-      const mockTimerDuration = 0;
+      // const mockTimerDuration = 0;
+      store.overrideSelector(selectTimerDuration, 0);
 
       actions$ = of(QuizPageActions.timerTick());
-      const storeMock = jest
-        .spyOn(store, 'pipe')
-        .mockReturnValue(of(mockTimerDuration));
       const dispatchSpy = jest.spyOn(store, 'dispatch');
       effects.stopTimer$.subscribe();
-      tick();
-      expect(storeMock).toHaveBeenCalled();
       expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.stopTimer());
       expect(dispatchSpy).toHaveBeenCalledWith(QuizPageActions.finishQuiz());
       flush();
-      discardPeriodicTasks();
+      // discardPeriodicTasks();
     }));
     it('should not dispatch any action when timerDuration is not 0', fakeAsync(() => {
-      const mockTimerDuration = 10;
-
+      // const mockTimerDuration = 10;
+      store.overrideSelector(selectTimerDuration, 10);
       actions$ = of(QuizPageActions.timerTick());
-      const storeMock = jest
-        .spyOn(store, 'pipe')
-        .mockReturnValue(of(mockTimerDuration));
+      // const storeMock = jest
+      //   .spyOn(store, 'pipe')
+      //   .mockReturnValue(of(mockTimerDuration));
       const dispatchSpy = jest.spyOn(store, 'dispatch');
       effects.stopTimer$.subscribe();
 
-      tick();
-
-      expect(storeMock).toHaveBeenCalled();
+      // expect(storeMock).toHaveBeenCalled();
       expect(dispatchSpy).not.toHaveBeenCalledWith(QuizPageActions.stopTimer());
       expect(dispatchSpy).not.toHaveBeenCalledWith(
         QuizPageActions.finishQuiz()
       );
       flush();
-    }));
-    it('should select timer duration from the store using concatLatestFrom', fakeAsync(() => {
-      const mockTimerDuration = 5;
-      actions$ = of(QuizPageActions.timerTick());
-
-      const selectSpy = jest
-        .spyOn(store, 'pipe')
-        .mockReturnValue(of(mockTimerDuration));
-      effects.stopTimer$.subscribe();
-
-      tick();
-
-      expect(selectSpy).toHaveBeenCalledWith(selectTimerDuration);
     }));
   });
 });
